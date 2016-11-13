@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - geometry - vertex colors</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+            svg{
+                width:1000px;
+                height:1000px;
+            }
+
+			circle{
+				stroke:rgba(0,0,0,0.2);
+			}
+		</style>
+	</head>
+	<body>
+		<div id="container"></div>
+		<script src="libs/d3.v3.min.js"></script>
+		<script src="libs/jquery-1.11.1.min.js"></script>
+		<script>
+
+            var width = 1000, height = 1000;
+
+            var projection = d3.geo.mercator()
+            	.center([13.35, 52.45])
+                .rotate([0, 0])
+                //.parallels([50, 60])
+                .scale(80000)
+                .translate([width / 2, height / 2]);
+
+            var color1 = [0, 0, 0];
+            var color2 = [255,255,255];
+
+            var min = 0, max = 2500;
+            var color = d3.scale.linear().domain([min,max]).range([color1, color2]);
+
+            var svg = d3.select('#container').append('svg').attr('width', width).attr('height', height);
+
+            d3.csv('../data/cities/grid.csv', function(data){
+                svg.selectAll('circle').data(data).enter().append('circle')
+                    .attr('r',2)
+                    .attr('cx', function(d){ var p = projection([parseFloat(d.lng), parseFloat(d.lat)]); return p[0]; })
+                    .attr('cy', function(d){ var p = projection([parseFloat(d.lng), parseFloat(d.lat)]); return p[1]; })
+                    .style('fill', function(d){
+                        d.val = parseFloat(d.val);
+                        //if(d.val>max){d.val=max;}
+                        //if(d.val<min){d.val=min;}
+                        var c = color(d.val);
+                        return "rgb("+Math.round(c[0])+","+Math.round(c[1])+","+Math.round(c[2])+")";
+                    });
+            });
+
+        </script>
+	</body>
+</html>

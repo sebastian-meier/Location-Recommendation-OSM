@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+        <title>Walks</title>
+        <meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width">
+		<script src="libs/d3.v3.min.js" charset="utf-8" type="text/javascript" ></script>
+		<style type="text/css">
+			circle{
+			    stroke:transparent;
+                fill:#000000;
+			}
+		</style>
+	</head>
+	<body>
+        <script type="text/javascript">
+
+            var cities = [
+                 {
+                    //Berlin
+                    min_longitude:13.0883536782043,
+                    max_longitude:13.761131111581,
+                    min_latitude:52.3382388102358,
+                    max_latitude:52.6755085785852
+                 },
+                 {
+                    //Hamburg
+                    min_longitude:9.728689,
+                    max_longitude:10.320578,
+                    min_latitude:53.396665,
+                    max_latitude:53.748130
+                 },
+                 {
+                    //Cologne
+                    min_longitude:6.766130,
+                    max_longitude:7.168504,
+                    min_latitude:50.825923,
+                    max_latitude:51.088029
+                 },
+                 {
+                    //Munich
+                    min_longitude:11.357809,
+                    max_longitude:11.727911,
+                    min_latitude:48.061293,
+                    max_latitude:48.250474
+                 }
+            ];
+
+            var names = ["Berlin","Hamburg","Cologne","Munich"];
+
+            var center = {}, projection = {}, g = {},
+                width = 700,
+                max = 1000,
+                height = 700,
+                margin = 50,
+                count = 0,
+                svg = d3.select('body').append("svg").attr("height",(height+margin*2)).attr("width",(width*cities.length+margin*(cities.length+1)));
+
+            for(var c = 0; c < cities.length; c++){
+                center[c] = [(cities[c].min_longitude+(cities[c].max_longitude-cities[c].min_longitude)/2), (cities[c].min_latitude+(cities[c].max_latitude-cities[c].min_latitude)/2)];
+                g[c] = svg.append("g").attr("transform","translate("+(margin+(width+margin)*c)+",0)");
+                projection[c] = d3.geo.mercator()
+					.precision(0.1)
+					.translate([width / 2, height / 2])
+					.scale(100000)
+					.center(center[c]);
+            }
+
+            count = 0;
+            buildCity();
+
+            function buildCity(){
+                d3.csv("../data/cities/cities_transport_"+names[count]+".csv", function(data){
+                    g[count].selectAll("circle").data(data).enter().append("circle")
+                        .attr("r",2)
+                        .attr("cx",function(d){
+                            return (projection[count]([d.x,d.y]))[0];
+                        })
+                        .attr("cy",function(d){
+                            return (projection[count]([d.x,d.y]))[1];
+                        })
+                        .style("opacity",function(d){
+                            var v = d3.min([parseFloat(d.bus),parseFloat(d.subway),parseFloat(d.tram),parseFloat(d.lightrail)]);
+                            var r = (v/max).toFixed(2);
+                            if(r>1){r=1;}
+
+                            var p = projection[count]([d.x,d.y]);
+                            if(p[0]<0 || p[0]>width){r = 0;}
+                            if(p[1]<0 || p[1]>height){r = 0;}
+
+                            return r;
+                        });
+
+                    count++;
+                    if(count>=cities.length){
+                        console.log("done");
+                    }else{
+                        buildCity();
+                    }
+                });
+            }
+
+	    </script>
+	</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+        <title>Walks</title>
+        <meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width">
+		<script src="libs/d3.v3.min.js" charset="utf-8" type="text/javascript" ></script>
+		<style type="text/css">
+			circle{
+			    stroke:transparent;
+                fill:#000000;
+			}
+		</style>
+	</head>
+	<body>
+        <script type="text/javascript">
+
+            var cities = [
+                 {
+                    //Berlin
+                    min_longitude:13.0883536782043,
+                    max_longitude:13.761131111581,
+                    min_latitude:52.3382388102358,
+                    max_latitude:52.6755085785852
+                 }
+            ];
+
+            var names = ["Berlin"], data;
+
+            var center = {}, projection = {}, g = {},
+                width = 700,
+                max = 500,
+                height = 700,
+                margin = 50,
+                count = 0,
+                svg = d3.select('body').append("svg").attr("height",1000).attr("width",4000);
+
+            for(var c = 0; c < cities.length; c++){
+                center[c] = [(cities[c].min_longitude+(cities[c].max_longitude-cities[c].min_longitude)/2), (cities[c].min_latitude+(cities[c].max_latitude-cities[c].min_latitude)/2)];
+                projection[c] = d3.geo.mercator()
+					.precision(0.1)
+					.translate([width / 2, height / 2])
+					.scale(100000)
+					.center(center[c]);
+            }
+
+            count = 0;
+            buildCity();
+
+            function buildCity(){
+                d3.csv("../data/cities/"+names[count]+".csv", function(d){
+					data = d;
+					drawCity();
+                });
+            }
+
+			function drawCity(){
+				var g = svg.append("g").attr("transform","translate("+(margin+(width+margin)*count)+",0)");
+
+				g.selectAll("circle").data(data).enter().append("circle")
+					.attr("r",2)
+					.attr("cx",function(d){
+						return (projection[0]([d.x,d.y]))[0];
+					})
+					.attr("cy",function(d){
+						return (projection[0]([d.x,d.y]))[1];
+					})
+					.style("fill",function(d){
+						var v;
+						switch(count){
+							case 0:
+								v = d3.min([parseFloat(d.bus),parseFloat(d.subway),parseFloat(d.tram),parseFloat(d.lightrail)]);
+							break;
+							case 1:
+								v = parseFloat(d.water);
+							break;
+							case 2:
+								v = parseFloat(d.green);
+							break;
+							case 3:
+								v = d3.min([parseFloat(d.road_l1),parseFloat(d.road_l2),parseFloat(d.road_l3)]);
+							break;
+						}
+
+						//var v = parseFloat(d.water);
+						var r = 0.9;
+						if(v>max){
+
+						}else{
+							r = (v/max * 0.9);
+						}
+						/*var r = (v/max).toFixed(2);
+						if(r>1){r=1;}*/
+
+						return "rgb("+Math.round(r*255.0)+","+Math.round(r*255.0)+","+Math.round(r*255.0)+")";
+					})
+					.style("opacity", function(d){
+						var r = 1;
+						var p = projection[0]([d.x,d.y]);
+						if(p[0]<0 || p[0]>width){r = 0;}
+						if(p[1]<0 || p[1]>height){r = 0;}
+						return r;
+					});
+				count++;
+				if(count>=4){
+					console.log("done");
+				}else{
+					setTimeout(drawCity, 100);
+				}
+			}
+
+	    </script>
+	</body>
+</html>

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+        <title>Walks</title>
+        <meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width">
+		<script src="libs/d3.v3.min.js" charset="utf-8" type="text/javascript" ></script>
+		<script src="libs/topojson.v1.min.js" charset="utf-8" type="text/javascript" ></script>
+		<script src="libs/crossfilter.min.js" charset="utf-8" type="text/javascript" ></script>
+		<style type="text/css">
+			body,html{
+				margin:0;
+				padding:20px;
+			}
+
+			svg{
+				border:1px solid red;
+			}
+
+            .bg rect{
+            	stroke:transparent;
+				fill:rgb(230,230,230);
+            }
+
+			.bg.bg-0 rect{
+				fill:rgb(0,0,0);
+			}
+
+			.x-axis{
+				font-family:Helvetica Neue, Helvetica, sans-serif;
+				font-size:10px;
+			}
+
+			line.x-axis-horizontal, .x-axis-tick line{
+				fill:transparent;
+				opacity:1;
+				stroke:rgb(100,100,100);
+				stroke-width:2px;
+				shape-rendering:cripsEdges;
+			}
+
+			.bezirke{
+				fill:transparent;
+				stroke:rgb(200,200,200);
+			}
+
+			.blue{	fill:rgb(81,148,193) !important;}
+			.orange{fill:rgb(225,160,45) !important;}
+			.green{	fill:rgb(139,191,74) !important;}
+
+			circle.blue, circle.orange, circle.green{
+				opacity: 0.5;
+			}
+
+			.rectmask{
+				fill:black;
+				stroke:transparent;
+			}
+
+			.mapborder{
+				fill:transparent;
+				stroke:rgb(200,200,200);
+				stroke-width:3px;
+			}
+
+			.mapborder-0{
+				stroke:black;
+			}
+		</style>
+	</head>
+	<body>
+        <script type="text/javascript">
+
+			var cats = [52,26,194],
+				rcats = (function(){ var r = {}; for(var i = 0; i<cats.length; i++){ r[cats[i]] = i; } return r; })(),
+				colors = ["blue", "orange", "green"],
+				types = ["individual","parallel","all_parallel","twostep_prio_bins","twostep_prio_cont","threestep_prio_bins","threestep_prio_cont"],
+				width = 300,
+				vmargin = 50,
+				hmargin = 100,
+				mmargin = 20,
+				height = 50,
+				bins = 10,
+				barsize = width/bins,
+				max = {},
+				g = {},
+				y = {},
+				maxr = 60,
+				histograms,
+				cols = 30;
+
+			/*GEO*/
+
+			var gwidth = width,
+				gheight = 250,
+				center = [13.42,52.507],
+				oprojection = d3.geo.mercator()
+					.precision(0.1)
+					.translate([gwidth / 2, gheight / 2])
+					.scale(25000)
+					.center(center),
+				projection = d3.geo.mercator()
+					.precision(0.1)
+					.translate([gwidth / 2, gheight / 2])
+					.scale(70000)
+					.center(center),
+				path = d3.geo.path()
+					.projection(projection),
+				opath = d3.geo.path()
+					.projection(oprojection),
+				m = {},
+				msk = {};
+
+			/*BOXPLOTS*/
+
+			var chart = d3.box()
+			    .whiskers(iqr(1.5))
+			    .width(20)
+			    .height(height)
+				.showLabels(true);
+
+			var origin = d3.select('body').append('svg').attr('width',((width+hmargin)*cols)).attr('height',800),
+				defs = origin.append('defs'),
+				svg = origin.append('g').attr("transform","translate("+mmargin+","+mmargin+")");
+
+			function log(n, el){
+				return Math.sqrt(n / max[el]);
+			}
+
+			function logr(n, el){
+				return Math.sqrt(n / maxr);
+			}
+
+			function timer(){
+
+			}
+
+			function barBlock(el, i, b, d){
+				d.forEach(function(sel, si, sarr){
+					if(sel>0){
+						g[el][b].append("g")
+							.attr("transform","translate("+(si*barsize)+","+(height-y[el](log(sel,el)))+")")
+							.append("rect")
+								.attr("width",barsize-1)
+								.attr("height",y[el](log(sel,el)))
+								.attr("class", colors[rcats[el]]);
+						g[el][b].append("g")
+							.attr("transform","translate("+(si*barsize)+","+(height-y[el](logr(sel,el)))+")")
+							.append("rect")
+								.attr("opacity",0.5)
+								.attr("width",barsize-1)
+								.attr("height",y[el](logr(sel,el)))
+								.attr("class", colors[rcats[el]]);
+					}
+				});
+			}
+
+			function descriptors(d){
+				var results = {};
+				cats.forEach(function(el, i, arr){
+					results[el] = [];
+					for(var b = 0; b<bins; b++){
+						results[el].push(0);
+					}
+				});
+
+				cats.forEach(function(el, i, arr){
+					d.forEach(function(sel, si, sarr){
+						if(sel["cat_"+el] > 0){
+							var id = Math.ceil(sel["cat_"+el] / histograms[el].binsize)-1;
+							if(id>=bins){id--;}
+							results[el][id]++;
+						}
+					});
+				});
+				return results;
+			}
+
+			d3.json('../10_histograms.json', function(data){
+				histograms = data;
+				d3.json('bezirke.topojson', function(bezirke){
+					for(var b = 0; b<cols; b++){
+						msk[b] = defs.append("clipPath") //mask
+							.attr("id","mapMask_"+b)
+								.append("rect")
+									.attr("class","rectmask")
+									.attr("x",0)
+									.attr("y",0)
+									.attr("width",gwidth)
+									.attr("height",gheight);
+
+						m[b] = svg.append("g").style("clip-path","url(#mapMask_"+b+")").attr("transform", "translate("+b*(width+hmargin)+","+cats.length*(height+vmargin)+")");
+						m[b].selectAll('path').data(topojson.feature(bezirke, bezirke.objects.berlin_bezirke).features).enter().append("path")
+							.attr("class","bezirke")
+							.attr("d", (b===0)?opath:path);
+						m[b].append("rect").attr("x",0).attr("y",0).attr("width",gwidth).attr("height",gheight).attr("class","mapborder mapborder-"+b).attr("transform",(b===0)?"translate(96,79) scale(0.36)":"");
+
+						cats.forEach(function(el, i, arr){
+							max[el] = d3.max(histograms[el].bins);
+							y[el] = d3.scale.linear().domain([0,1]).range([0,height]);
+							if(!(el in g)){
+								g[el] = {};
+							}
+							g[el][b] = svg.append("g").attr("class", "bg bg-"+b).attr("transform","translate("+b*(width+hmargin)+","+i*(height+vmargin)+")");
+							g[el][b].append("line").attr("x1",0).attr("x2",width-1).attr("y1",(height+2)).attr("y2",(height+2)).attr("class", "x-axis-horizontal");
+							histograms[el].bins.forEach(function(sel, si, sarr){
+								g[el][b].append("g").attr("transform","translate("+(si*barsize)+","+(height-y[el](log(sel,el)))+")").append("rect").attr("width",barsize-1).attr("height",y[el](log(sel,el)));
+							});
+							(d3.range(0,(histograms[el].bins.length+1),1)).forEach(function(sel, si, sarr){
+								g[el][b].append("g").attr("class","x-axis").attr("transform","translate("+(si*barsize)+","+(height+17)+")").append("text").text(function(){
+									var r = (histograms[el].binsize*si).toFixed(1);
+									if(si === 0){
+										r = ">"+r;
+									}
+									return r;
+								}).attr("text-anchor","middle");
+							});
+							(d3.range(0,(histograms[el].bins.length+1),1)).forEach(function(sel, si, sarr){
+								g[el][b].append("g").attr("class","x-axis-tick").attr("transform","translate("+(si*barsize)+","+(height+1)+")").append("line")
+									.attr("x1",0)
+									.attr("x2",0)
+									.attr("y1",0)
+									.attr("y2",5);
+							});
+						});
+					}
+
+					d3.json('../clusterPerformance.json', function(cluster){
+
+						console.log(cluster);
+
+						//individual
+						cats.forEach(function(el, i, arr){
+							var dscrptrs = descriptors(cluster.individual[el].descriptors);
+
+							barBlock(el, i, 1, dscrptrs[el]);
+
+							cluster.individual[el].result.forEach(function(sel, si, sarr){
+								var p = projection([sel.longitude, sel.latitude]);
+								m[1].append('circle').attr('cx', p[0]).attr('cy', p[1]).attr("r", 4).attr("class",colors[i]);
+							});
+
+						});
+
+						//parallel
+						([[52,26],[52,194],[26,194]]).forEach(function(el, i, arr){
+							var key = el[0]+"_"+el[1];
+							var dscrptrs = descriptors(cluster.parallel[key].descriptors);
+
+							barBlock(el[0], 0, 2+i, dscrptrs[el[0]]);
+							barBlock(el[1], 1, 2+i, dscrptrs[el[1]]);
+
+							cluster.parallel[key].result.forEach(function(sel, si, sarr){
+								var p = projection([sel.longitude, sel.latitude]);
+								m[2+i].append('circle').attr('cx', p[0]).attr('cy', p[1]).attr("r", 4).attr("class",colors[rcats[sel.categories_id]]);
+							});
+
+						});
+
+						//all_parallel
+						var dscrptrs = descriptors(cluster.all_parallel.descriptors);
+
+						barBlock(cats[0], 0, 5, dscrptrs[cats[0]]);
+						barBlock(cats[1], 1, 5, dscrptrs[cats[1]]);
+						barBlock(cats[2], 2, 5, dscrptrs[cats[2]]);
+
+						cluster.all_parallel.result.forEach(function(sel, si, sarr){
+							var p = projection([sel.longitude, sel.latitude]);
+							m[5].append('circle').attr('cx', p[0]).attr('cy', p[1]).attr("r", 4).attr("class",colors[rcats[sel.categories_id]]);
+						});
+
+						//twostep_prio_bins
+						([[52,26],[52,194],[26,194],[26,52],[194,52],[194,26]]).forEach(function(el, i, arr){
+							var key = el[0]+"_"+el[1];
+							var dscrptrs = descriptors(cluster.twostep_prio_bins[key].descriptors);
+
+							barBlock(el[0], 0, 6+i, dscrptrs[el[0]]);
+							barBlock(el[1], 1, 6+i, dscrptrs[el[1]]);
+
+							cluster.twostep_prio_bins[key].result.forEach(function(sel, si, sarr){
+								var p = projection([sel.longitude, sel.latitude]);
+								m[6+i].append('circle').attr('cx', p[0]).attr('cy', p[1]).attr("r", 4).attr("class",colors[rcats[sel.categories_id]]);
+							});
+
+						});
+
+						//twostep_prio_cont
+						([[52,26],[52,194],[26,194],[26,52],[194,52],[194,26]]).forEach(function(el, i, arr){
+							var key = el[0]+"_"+el[1];
+							var dscrptrs = descriptors(cluster.twostep_prio_cont[key].descriptors);
+
+							barBlock(el[0], 0, 12+i, dscrptrs[el[0]]);
+							barBlock(el[1], 1, 12+i, dscrptrs[el[1]]);
+
+							cluster.twostep_prio_cont[key].result.forEach(function(sel, si, sarr){
+								var p = projection([sel.longitude, sel.latitude]);
+								m[12+i].append('circle').attr('cx', p[0]).attr('cy', p[1]).attr("r", 4).attr("class",colors[rcats[sel.categories_id]]);
+							});
+
+						});
+
+						//threestep_prio_bins
+						([[26,52,194],[26,194,52],[52,26,194],[52,194,26],[194,26,52],[194,52,26]]).forEach(function(el, i, arr){
+							var key = el[0]+"_"+el[1]+"_"+el[2];
+							var dscrptrs = descriptors(cluster.threestep_prio_bins[key].descriptors);
+
+							barBlock(el[0], 0, 18+i, dscrptrs[el[0]]);
+							barBlock(el[1], 1, 18+i, dscrptrs[el[1]]);
+
+							cluster.threestep_prio_bins[key].result.forEach(function(sel, si, sarr){
+								var p = projection([sel.longitude, sel.latitude]);
+								m[18+i].append('circle').attr('cx', p[0]).attr('cy', p[1]).attr("r", 4).attr("class",colors[rcats[sel.categories_id]]);
+							});
+
+						});
+
+						//threestep_prio_cont
+						([[26,52,194],[26,194,52],[52,26,194],[52,194,26],[194,26,52],[194,52,26]]).forEach(function(el, i, arr){
+							var key = el[0]+"_"+el[1]+"_"+el[2];
+							var dscrptrs = descriptors(cluster.threestep_prio_cont[key].descriptors);
+
+							barBlock(el[0], 0, 24+i, dscrptrs[el[0]]);
+							barBlock(el[1], 1, 24+i, dscrptrs[el[1]]);
+
+							cluster.threestep_prio_cont[key].result.forEach(function(sel, si, sarr){
+								var p = projection([sel.longitude, sel.latitude]);
+								m[24+i].append('circle').attr('cx', p[0]).attr('cy', p[1]).attr("r", 4).attr("class",colors[rcats[sel.categories_id]]);
+							});
+
+						});
+
+					});
+				});
+			});
+
+	    </script>
+	</body>
+</html>

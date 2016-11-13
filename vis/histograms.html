@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+        <title>Walks</title>
+        <meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width">
+        <script src="libs/topojson.v1.min.js" charset="utf-8" type="text/javascript" ></script>
+		<script src="libs/d3.v3.min.js" charset="utf-8" type="text/javascript" ></script>
+		<script src="libs/crossfilter.min.js" charset="utf-8" type="text/javascript" ></script>
+		<style type="text/css">
+			body,html{
+				margin:0;
+				padding:0;
+			}
+
+            rect{
+            	fill:black;
+            }
+
+			text{
+				font-family: Arial, sans-serif;
+				font-size:10px;
+			}
+
+			.bg-h-line{
+				stroke:rgba(0,0,0,0.1);
+				shape-rendering:crispEdges;
+				stroke-width:1px;
+			}
+
+			.bg-v-line{
+				stroke:rgba(0,0,0,0.1);
+				shape-rendering:crispEdges;
+				stroke-width:1px;
+			}
+		</style>
+	</head>
+	<body>
+        <script type="text/javascript">
+
+			var venues,
+				filtered = [],
+				cats = [52,26,194],
+				catspre = [7,6,0],
+				bins = 10,
+				dimensions = {},
+				cross,
+				max = -Number.MAX_VALUE,
+				fmax = -Number.MAX_VALUE,
+				zmax = -Number.MAX_VALUE,
+				mm = {},
+				width = 300,
+				height = 100,
+				margin = 50,
+				scale = null,
+				zscale = null,
+				barsize = width/bins,
+				minResult = 50;
+
+			for(var i = 0; i<cats.length; i++){
+				mm[cats[i]] = {
+					min:Number.MAX_VALUE,
+					max:-Number.MAX_VALUE,
+					binsize:0,
+					bins:[],
+					fmin:Number.MAX_VALUE,
+					fmax:-Number.MAX_VALUE,
+					fbinsize:0,
+					fbins:[],
+					nulls:0,
+					svg:null,
+					ibins:[],
+					iibins:[]
+				};
+
+				for(var b = 0; b<bins; b++){
+					mm[cats[i]].fbins.push(0);
+					mm[cats[i]].bins.push(0);
+					mm[cats[i]].ibins.push(0);
+					mm[cats[i]].iibins.push(0);
+				}
+			}
+
+			var svg = d3.select('body').append('svg').attr('height',(cats.length*(height+margin)+margin)).attr('width', (width*4+margin*6));
+			var filters = d3.select('body').append('div');
+
+			d3.csv("../cat_analysis.csv", function(data){
+				venues = data.map(function(d){
+					var obj = {
+						id:parseInt(d.id),
+						lat:parseFloat(d.latitude),
+						lng:parseFloat(d.longitude),
+						cats:{}
+					};
+
+					for(var i = 0; i<cats.length; i++){
+						var n = parseFloat(d["cat_"+cats[i]]);
+						if(n<mm[cats[i]].min){ mm[cats[i]].min = n; }
+						if(n>mm[cats[i]].max){ mm[cats[i]].max = n; }
+						obj.cats[cats[i]] = n;
+					}
+
+					//filtered data
+					var allin = true;
+
+					for(var i = 0; i<cats.length; i++){
+						if(obj.cats[cats[i]] === 0){
+							allin = false;
+						}
+					}
+
+					if(allin){
+						for(var i = 0; i<cats.length; i++){
+							var n = parseFloat(d["cat_"+cats[i]]);
+							if(n<mm[cats[i]].fmin){ mm[cats[i]].fmin = n; }
+							if(n>mm[cats[i]].fmax){ mm[cats[i]].fmax = n; }
+						}
+						filtered.push(obj);
+					}
+
+					return obj;
+				});
+
+				for(var i = 0; i<cats.length; i++){
+					mm[cats[i]].binsize = (mm[cats[i]].max-mm[cats[i]].min)/bins;
+					mm[cats[i]].fbinsize = (mm[cats[i]].fmax-mm[cats[i]].fmin)/bins;
+				}
+
+				for(var v = 0; v<venues.length; v++){
+					for(var i = 0; i<cats.length; i++){
+						if(venues[v].cats[cats[i]] === 0){
+							mm[cats[i]].nulls++;
+						}else{
+							mm[cats[i]].bins[Math.ceil(venues[v].cats[cats[i]]/mm[cats[i]].binsize)-1]++;
+						}
+					}
+				}
+
+				for(var v = 0; v<filtered.length; v++){
+					for(var i = 0; i<cats.length; i++){
+						if(filtered[v].cats[cats[i]] !== 0){
+							var id = Math.ceil(filtered[v].cats[cats[i]]/mm[cats[i]].fbinsize)-1;
+							if(id > bins-1){
+								id--;
+							}
+							mm[cats[i]].fbins[id]++;
+						}
+					}
+				}
+
+				for(var i = 0; i<cats.length; i++){
+					for(var b = 0; b<mm[cats[i]].bins.length; b++){
+						if(mm[cats[i]].bins[b]>max){
+							max = mm[cats[i]].bins[b];
+						}
+					}
+
+					if(mm[cats[i]].nulls > zmax){
+						zmax = mm[cats[i]].nulls;
+					}
+				}
+
+				for(var i = 0; i<cats.length; i++){
+					for(var b = 0; b<mm[cats[i]].fbins.length; b++){
+						if(mm[cats[i]].fbins[b]>fmax){
+							fmax = mm[cats[i]].fbins[b];
+						}
+					}
+				}
+
+				//crossfilter start
+				var records = [];
+				for(var v = 0; v<filtered.length; v++){
+					var record = {
+						id: filtered[v].id,
+						lat: filtered[v].lat,
+						lng: filtered[v].lng
+					};
+					for(var i = 0; i<cats.length; i++){
+						//record[cats[i]] = filtered[v].cats[cats[i]];
+						var id = Math.ceil(filtered[v].cats[cats[i]]/mm[cats[i]].fbinsize)-1;
+						if(id > bins-1){
+							id--;
+						}
+						record["bin_"+cats[i]] = id;
+					}
+					records.push(record);
+				}
+
+				cross = crossfilter(records);
+
+				for(var i = 0; i<cats.length; i++){
+					//dimensions[cats[i]] = cross.dimension(function(d){ return d[cats[i]]; });
+					dimensions["bin_"+cats[i]] = cross.dimension(function(d){ return d["bin_"+cats[i]]; });
+				}
+
+				//crossfilter end
+
+				scale = d3.scale.linear().domain([0,1]).range([0,(height-margin)]);
+				zscale = d3.scale.linear().domain([0,zmax]).range([0,(width-margin)]);
+
+				for(var i = 0; i<cats.length; i++){
+					mm[cats[i]].svg = svg.append("g").attr("transform", "translate("+margin+", "+((height+margin)*i+margin)+")");
+
+					var lines = 10;
+					for(var l = 0; l<lines; l++){
+						mm[cats[i]].svg.append("line")
+							.attr("class", "bg-h-line")
+							.attr("x1", 0)
+							.attr("x2", (margin*3+width*4))
+							.attr("y1", l*((height-margin)/(lines-1)))
+							.attr("y2", l*((height-margin)/(lines-1)));
+					}
+
+					var bars = mm[cats[i]].svg.append("g").attr("class","bars");
+						bars.selectAll("rect").data(mm[cats[i]].bins).enter().append("rect")
+							.attr("width", barsize)
+							.attr("transform", function(d, i){
+								return "translate("+i*barsize+", "+(height-margin-scale(Math.sqrt(d/max)))+")";
+							})
+							.attr("height", function(d){
+								return scale(Math.sqrt(d/max));
+							});
+
+					/*var zeros = mm[cats[i]].svg.append("g").attr("class","zeros").attr("transform","translate("+(width+margin)+",0)");
+						zeros.append("rect").attr("height", barsize).attr("width", zscale(mm[cats[i]].nulls));*/
+
+					var scales = mm[cats[i]].svg.append("g").attr("class","scale").attr("transform", "translate(0,"+(height-margin+13)+")");
+						scales.selectAll("text").data(d3.range((bins+1))).enter().append("text")
+							.text(function(d,j){
+								return (j*mm[cats[i]].binsize).toFixed(1);
+							})
+							.attr("text-anchor","middle")
+							.attr("transform", function(d, i){
+								return "translate("+(i*(width/bins))+",0)";
+							});
+
+					//filtered
+					var fbars = mm[cats[i]].svg.append("g").attr("class","fbars").attr("transform", "translate("+(width+margin)+",0)");
+						fbars.selectAll("rect").data(mm[cats[i]].fbins).enter().append("rect")
+							.attr("width", barsize)
+							.attr("transform", function(d, i){
+								return "translate("+i*barsize+", "+(height-margin-scale(Math.sqrt(d/max)))+")";
+							})
+							.attr("height", function(d){
+								return scale(Math.sqrt(d/max));
+							});
+
+					var fscales = mm[cats[i]].svg.append("g").attr("class","fscale").attr("transform", "translate("+(width+margin)+","+(height-margin+13)+")");
+						fscales.selectAll("text").data(d3.range((bins+1))).enter().append("text")
+							.text(function(d,j){
+								return (j*mm[cats[i]].fbinsize).toFixed(1);
+							})
+							.attr("text-anchor","middle")
+							.attr("transform", function(d, i){
+								return "translate("+(i*(width/bins))+",0)";
+							});
+
+					//crossfiltered
+					var cbars = mm[cats[i]].svg.append("g").attr("class","cbars").attr("transform", "translate("+(width*2+margin*2)+",0)");
+						cbars.selectAll("rect").data(mm[cats[i]].ibins).enter().append("rect")
+							.attr("width", barsize)
+							.attr("transform", function(d, i){
+								return "translate("+i*barsize+", "+(height-margin-scale(Math.sqrt(d/max)))+")";
+							})
+							.attr("height", function(d){
+								return scale(Math.sqrt(d/max));
+							});
+
+					var cscales = mm[cats[i]].svg.append("g").attr("class","cscale").attr("transform", "translate("+(width*2+margin*2)+","+(height-margin+13)+")");
+						cscales.selectAll("text").data(d3.range((bins+1))).enter().append("text")
+							.text(function(d,j){
+								return (j*mm[cats[i]].fbinsize).toFixed(1);
+							})
+							.attr("text-anchor","middle")
+							.attr("transform", function(d, i){
+								return "translate("+(i*(width/bins))+",0)";
+							});
+
+					//crossfiltered #2
+					var icbars = mm[cats[i]].svg.append("g").attr("class","icbars").attr("transform", "translate("+(width*3+margin*3)+",0)");
+						icbars.selectAll("rect").data(mm[cats[i]].ibins).enter().append("rect")
+							.attr("width", barsize)
+							.attr("transform", function(d, i){
+								return "translate("+i*barsize+", "+(height-margin-scale(Math.sqrt(d/max)))+")";
+							})
+							.attr("height", function(d){
+								return scale(Math.sqrt(d/max));
+							});
+
+					var icscales = mm[cats[i]].svg.append("g").attr("class","icscale").attr("transform", "translate("+(width*3+margin*3)+","+(height-margin+13)+")");
+						icscales.selectAll("text").data(d3.range((bins+1))).enter().append("text")
+							.text(function(d,j){
+								return (j*mm[cats[i]].fbinsize).toFixed(1);
+							})
+							.attr("text-anchor","middle")
+							.attr("transform", function(d, i){
+								return "translate("+(i*(width/bins))+",0)";
+							});
+
+					var cfilter = filters.append("div").attr("class","filter");
+						cfilter.append("input").attr("type","text").attr("value",catspre[i]/10*bins).attr("id", "filter_min_"+cats[i]).on("input", function() {filterUpdate();});
+						cfilter.append("input").attr("type","text").attr("value",bins).attr("id", "filter_max_"+cats[i]).on("input", function() {filterUpdate();});
+
+						cfilter.append("input").attr("type","text").attr("value",4/10*bins).attr("id", "ifilter_min_"+cats[i]).on("input", function() {iFilterUpdate();});
+						cfilter.append("input").attr("type","text").attr("value",bins).attr("id", "ifilter_max_"+cats[i]).on("input", function() {iFilterUpdate();});
+
+				}
+
+				filters.append("div").html("Sum 1:<span id='sum'></span>");
+				filters.append("div").html("Sum 2:<span id='isum'></span>");
+
+				filterUpdate();
+				iFilterUpdate();
+
+			});
+
+			function filterUpdate(){
+
+				for(var i = 0; i<cats.length; i++){
+					var tmin = document.getElementById("filter_min_"+cats[i]).value;
+					var tmax = document.getElementById("filter_max_"+cats[i]).value;
+
+					if(tmin === tmax){
+						dimensions["bin_"+cats[i]].filterExact(tmin);
+					}else{
+						dimensions["bin_"+cats[i]].filterRange([tmin,tmax]);
+					}
+				}
+
+				for(var i = 0; i<cats.length; i++){
+					for(var b = 0; b<bins; b++){
+						mm[cats[i]].ibins[b] = 0;
+					}
+				}
+
+				var data = dimensions["bin_"+cats[0]].top(Infinity);
+				d3.select("#sum").text(data.length);
+				for(var v = 0; v<data.length; v++){
+					for(var i = 0; i<cats.length; i++){
+						mm[cats[i]].ibins[data[v]["bin_"+cats[i]]]++;
+					}
+				}
+
+				for(var i = 0; i<cats.length; i++){
+					var cbars = mm[cats[i]].svg.select(".cbars").selectAll("rect");
+						cbars.data(mm[cats[i]].ibins).transition().attr("transform", function(d, i){
+							return "translate("+i*barsize+", "+(height-margin-scale(Math.sqrt(d/max)))+")";
+						})
+						.attr("height", function(d){
+							return scale(Math.sqrt(d/max));
+						});
+				}
+
+			}
+
+			function iFilterUpdate(){
+
+				for(var i = 0; i<cats.length; i++){
+					var tmin = document.getElementById("ifilter_min_"+cats[i]).value;
+					var tmax = document.getElementById("ifilter_max_"+cats[i]).value;
+
+					if(tmin === tmax){
+						dimensions["bin_"+cats[i]].filterExact(tmin);
+					}else{
+						dimensions["bin_"+cats[i]].filterRange([tmin,tmax]);
+					}
+				}
+
+				for(var i = 0; i<cats.length; i++){
+					for(var b = 0; b<bins; b++){
+						mm[cats[i]].iibins[b] = 0;
+					}
+				}
+
+				var data = dimensions["bin_"+cats[0]].top(Infinity);
+				d3.select("#isum").text(data.length);
+				for(var v = 0; v<data.length; v++){
+					for(var i = 0; i<cats.length; i++){
+						mm[cats[i]].iibins[data[v]["bin_"+cats[i]]]++;
+					}
+				}
+
+				for(var i = 0; i<cats.length; i++){
+					var cbars = mm[cats[i]].svg.select(".icbars").selectAll("rect");
+						cbars.data(mm[cats[i]].iibins).transition().attr("transform", function(d, i){
+							return "translate("+i*barsize+", "+(height-margin-scale(Math.sqrt(d/max)))+")";
+						})
+						.attr("height", function(d){
+							return scale(Math.sqrt(d/max));
+						});
+				}
+
+			}
+	    </script>
+	</body>
+</html>

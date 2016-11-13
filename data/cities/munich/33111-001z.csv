@@ -1,0 +1,31 @@
+GENESIS-Tabelle: 33111-001z
+Fläche: Gemeinde, Fläche (ALKIS), Art der tatsächlichen;;;;;;;;;;;;;;;;;;
+Nutzung (6)/(10)/(17), Jahre (ab 31.12.2011);;;;;;;;;;;;;;;;;;
+Flächenerhebung nach Art der tatsächlichen Nutzung;;;;;;;;;;;;;;;;;;
+Bayern;;;;;;;;;;;;;;;;;;
+;Bodenfläche (ALKIS);Bodenfläche (ALKIS);Bodenfläche (ALKIS);Bodenfläche (ALKIS);Bodenfläche (ALKIS);Bodenfläche (ALKIS);Bodenfläche (ALKIS);Bodenfläche (ALKIS);Bodenfläche (ALKIS);Bodenfläche (ALKIS);Bodenfläche (ALKIS);Bodenfläche (ALKIS);Bodenfläche (ALKIS);Bodenfläche (ALKIS);Bodenfläche (ALKIS);Bodenfläche (ALKIS);Bodenfläche (ALKIS);Bodenfläche (ALKIS)
+;Art der tatsächlichen Nutzung;Art der tatsächlichen Nutzung;Art der tatsächlichen Nutzung;Art der tatsächlichen Nutzung;Art der tatsächlichen Nutzung;Art der tatsächlichen Nutzung;Art der tatsächlichen Nutzung;Art der tatsächlichen Nutzung;Art der tatsächlichen Nutzung;Art der tatsächlichen Nutzung;Art der tatsächlichen Nutzung;Art der tatsächlichen Nutzung;Art der tatsächlichen Nutzung;Art der tatsächlichen Nutzung;Art der tatsächlichen Nutzung;Art der tatsächlichen Nutzung;Art der tatsächlichen Nutzung;Art der tatsächlichen Nutzung
+;Insgesamt;Wohnen;Gewerbe, Industrie;sonstige Gebäude- und Freifläche;Betriebsfläche (ohne Abbauland);Abbauland;Grünanlage;sonstige Erholungsfläche;Straße, Weg, Platz;sonstige Verkehrsfläche;Moor;Heide;Landwirtschaftsfläche (ohne Moor, Heide);Waldfläche;Wasserfläche;Unland;Friedhof;Flächen anderer Nutzung (ohne Unland, Friedhof)
+;ar;ar;ar;ar;ar;ar;ar;ar;ar;ar;ar;ar;ar;ar;ar;ar;ar;ar
+31.12.2011;705503182;20661292;4497322;17066955;1801896;1568854;1995135;2963308;30598425;2233751;1334470;183402;331042500;256631022;12287557;20235698;401595;-
+31.12.2012;705502425;20798288;4514954;17161366;1877181;1559257;2019119;2983093;30690236;2214386;1307144;189072;330706864;256706314;12316621;20056575;401955;-
+31.12.2013;705501488;20912403;4520071;17338035;1953064;1562685;2042526;3008624;30729435;2206982;1317306;191747;329996050;256979883;12338962;19993993;409722;-
+31.12.2014;705501144;21047022;4500047;17480270;2008259;1549265;2069656;3009972;30784065;2200711;1310475;219754;329525818;257068663;12335856;19976498;414813;-
+_____
+Ab dem Berichtsjahr 2011 stehen aktualisierte Daten auf der
+Grundlage des Amtlichen
+Liegenschaftskataster-Informationssystems (ALKIS) zur
+Verfügung. Es ersetzt das bisher als Datenbasis verwendete
+Automatisierte Liegenschaftsbuch (ALB). Im Rahmen der
+ALKIS-Umstellung wurde in Bayern der gesamte
+Flächendatenbestand komplett neu erfasst. Während dem ALB
+teils veraltete Flurstücksdaten zu Grunde liegen, basiert
+ALKIS auf digital ermittelten geometrischen Flächen, bei
+denen überwiegend Luftaufnahmen genutzt wurden. Da bei der
+ALKIS-Umstellung nicht nur der Datenbestand aktualisiert,
+sondern auch die Nutzungsartenzuordnung teilweise geändert
+wurde, ist der Vergleich der ALKIS-Daten ab 2011 mit den
+ALB-Daten der vorangegangenen Jahre erheblich eingeschränkt.
+_____
+(C)opyright 2016 Bayerisches Landesamt für Statistik
+Stand: 13.04.2016 - 17:18:22

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+        <title>Walks</title>
+        <meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width">
+        <script src="libs/topojson.v1.min.js" charset="utf-8" type="text/javascript" ></script>
+		<script src="libs/d3.v3.min.js" charset="utf-8" type="text/javascript" ></script>
+		<style type="text/css">
+			body,html{
+				margin:0;
+				padding:0;
+			}
+
+            circle{
+                fill:#000;
+                stroke:transparent;
+            }
+
+            rect{
+                fill:transparent;
+            }
+
+            path{
+                fill:transparent;
+                stroke:#000;
+            }
+
+		</style>
+	</head>
+	<body>
+        <script type="text/javascript">
+
+            var width=1000,
+    		    height=1000,
+				center = [13.403528,52.540212];
+				zoom = d3.behavior.zoom()
+					.translate([width / 2, height / 2])
+					.scale(200000)
+					.scaleExtent([100000, 1500000])
+					.on("zoom", zoomed),
+    		    projection = d3.geo.mercator()
+        			.precision(0.1)
+        			.center(center),
+                path = d3.geo.path()
+                	.projection(projection),
+				container = d3.select('body').append('svg').attr('width', width).attr('height', height)
+                svg = container.append("g"),
+                map = svg.append("g"),
+                points = svg.append("g");
+
+			svg.append("rect")
+				.attr("class", "overlay")
+				.attr("width", width)
+				.attr("height", height);
+
+			svg
+			    .call(zoom)
+			    .call(zoom.event);
+
+			function zoomed() {
+				projection
+					.translate(zoom.translate())
+					.scale(zoom.scale());
+
+                map.selectAll("path")
+                    .attr("d", path);
+
+				points.selectAll("circle")
+					.attr("transform", translator);
+
+			}
+
+            function translator(d){
+				var p = projection([d[1],d[0]]);
+				return "translate("+(p[0])+" "+(p[1])+")";
+			}
+
+            d3.json("../cat_52.json", function(err, data){
+                points.selectAll("circle").data(data).enter().append("circle")
+                    .attr("r","3")
+                    .attr("cx","0")
+                    .attr("cy","0")
+                    .attr("transform", translator);
+            });
+
+            d3.json('bezirke.topojson', function(err, data){
+                map.selectAll('path').data(topojson.feature(data, data.objects.berlin_bezirke).features).enter().append("path")
+					.attr("d", path);
+            });
+
+	    </script>
+	</body>
+</html>

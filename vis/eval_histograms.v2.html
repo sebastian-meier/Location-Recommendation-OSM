@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+        <title>Walks</title>
+        <meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width">
+		<script src="libs/d3.v3.min.js" charset="utf-8" type="text/javascript" ></script>
+		<script src="libs/topojson.v1.min.js" charset="utf-8" type="text/javascript" ></script>
+		<script src="libs/crossfilter.min.js" charset="utf-8" type="text/javascript" ></script>
+		<script src="libs/box.js"></script>
+		<style type="text/css">
+			body,html{
+				margin:0;
+				padding:20px;
+			}
+
+			svg{
+				border:1px solid red;
+			}
+
+            .bg rect{
+            	stroke:transparent;
+				fill:rgba(230,230,230,0);
+            }
+
+			.bg.bg-0 rect{
+				fill:rgb(0,0,0);
+			}
+
+			.x-axis{
+				font-family:Helvetica Neue, Helvetica, sans-serif;
+				font-size:10px;
+			}
+
+			line.x-axis-horizontal, .x-axis-tick line{
+				fill:transparent;
+				opacity:1;
+				stroke:rgb(100,100,100);
+				stroke-width:2px;
+				shape-rendering:cripsEdges;
+			}
+
+			.bezirke{
+				fill:transparent;
+				stroke:rgb(200,200,200);
+			}
+
+			.blue{	fill:rgb(81,148,193) !important;}
+			.orange{fill:rgb(225,160,45) !important;}
+			.green{	fill:rgb(139,191,74) !important;}
+
+			circle.blue, circle.orange, circle.green{
+				opacity: 0.5;
+			}
+
+			.rectmask{
+				fill:black;
+				stroke:transparent;
+			}
+
+			.mapborder{
+				fill:transparent;
+				stroke:rgb(200,200,200);
+				stroke-width:3px;
+			}
+
+			.mapborder-0{
+				stroke:black;
+			}
+
+			.box, .barlabel text, .bracket text {
+				font: 10px sans-serif;
+			}
+
+			.barlabel text {
+				fill: rgba(200,200,200,0);
+			}
+
+			.barlabel text.col-0{
+				fill: rgb(0,0,0);
+			}
+
+			.barlabel text.el-52{
+				/*fill:rgb(81,148,193);*/
+				fill:rgba(0,0,0,0.7);
+			}
+
+			.barlabel text.el-26{
+				/*fill:rgb(225,160,45);*/
+				fill:rgba(0,0,0,0.7);
+			}
+
+			.barlabel text.el-194{
+				/*fill:rgb(139,191,74);*/
+				fill:rgba(0,0,0,0.7);
+			}
+
+			.bracket{
+				stroke-width:1px;
+				shape-rendering:cripsEdges;
+			}
+
+			.bracket.el-52{
+				stroke:rgb(81,148,193);
+			}
+
+			.bracket.el-26{
+				stroke:rgb(225,160,45);
+			}
+
+			.bracket.el-194{
+				stroke:rgb(139,191,74);
+			}
+
+			.bracket.el-52 text{
+				fill:rgb(81,148,193);
+				stroke:transparent;
+			}
+
+			.bracket.el-26 text{
+				fill:rgb(225,160,45);
+				stroke:transparent;
+			}
+
+			.bracket.el-194 text{
+				fill:rgb(139,191,74);
+				stroke:transparent;
+			}
+
+			.box line,
+			.box rect,
+			.box circle {
+				fill: #fff;
+				stroke: #000;
+				stroke-width: 1.5px;
+			}
+
+			.box .center {
+				stroke-dasharray: 3,3;
+			}
+
+			.box .outlier {
+				fill: none;
+				stroke: #ccc;
+			}
+
+			.bg_lines{
+				stroke:black;
+			}
+
+			.bg_line_groups{
+				stroke-width:1px;
+				shape-rendering:cripsEdges;
+				stroke:rgba(0,0,0,0.1);
+			}
+
+			.whiteover{
+				stroke:transparent;
+				fill:#fff;
+			}
+
+			.box rect.boxbgbar{
+				stroke:transparent;
+				fill:rgba(0,0,0,0.05);
+			}
+
+			.box, .box_bg{
+				opacity: 0;
+			}
+		</style>
+	</head>
+	<body>
+        <script type="text/javascript">
+
+			var cats = [52,26,194],
+				rcats = (function(){ var r = {}; for(var i = 0; i<cats.length; i++){ r[cats[i]] = i; } return r; })(),
+				colors = ["blue", "orange", "green"],
+				types = ["individual","parallel","all_parallel","twostep_prio_bins","twostep_prio_cont","threestep_prio_bins","threestep_prio_cont"],
+				width = 300,
+				vmargin = 80,
+				hmargin = 100,
+				mmargin = 20,
+				height = 50,
+				bins = 10,
+				barsize = width/bins,
+				max = {},
+				g = {},
+				y = {},
+				box = {},
+				boxbg = {},
+				barlabel = {},
+				maxr = 100,
+				histograms,
+				cols = 30;
+
+			/*GEO*/
+
+			var gwidth = width,
+				gheight = 250,
+				center = [13.42,52.507],
+				oprojection = d3.geo.mercator()
+					.precision(0.1)
+					.translate([gwidth / 2, gheight / 2])
+					.scale(25000)
+					.center(center),
+				projection = d3.geo.mercator()
+					.precision(0.1)
+					.translate([gwidth / 2, gheight / 2])
+					.scale(70000)
+					.center(center),
+				path = d3.geo.path()
+					.projection(projection),
+				opath = d3.geo.path()
+					.projection(oprojection),
+				m = {},
+				msk = {};
+
+			/*BOXPLOTS*/
+
+			var boxwidth = 20,
+				chart = d3.box()
+			    .whiskers(iqr(1.5))
+			    .width(boxwidth/2)
+			    .height(height*3+vmargin*2);
+
+			var grid_pos = [
+				[0,0],[1,0],[2,0],[3,0],[4,0],[5,0],
+					  		[2,1],[3,1],[4,1],
+					  		[2,2],[3,2],[4,2],
+					  		[2,3],[3,3],[4,3],
+					  		[2,4],[3,4],[4,4],
+					  		[2,5],[3,5],[4,5],[5,5],[6,5],[7,5],
+					  		[2,6],[3,6],[4,6],[5,6],[6,6],[7,6],
+			];
+
+			var bg_lines = {};
+			for(var i = 0; i<grid_pos.length; i++){
+				if(!(grid_pos[i][1] in bg_lines)){
+					bg_lines[grid_pos[i][1]] = {min:Number.MAX_VALUE, max:-Number.MAX_VALUE};
+				}
+				if(bg_lines[grid_pos[i][1]].min > grid_pos[i][0]){ bg_lines[grid_pos[i][1]].min = grid_pos[i][0]; }
+				if(bg_lines[grid_pos[i][1]].max < grid_pos[i][0]){ bg_lines[grid_pos[i][1]].max = grid_pos[i][0]; }
+			}
+
+			var origin = d3.select('body').append('svg').attr('width',((width+hmargin)*12)).attr('height',8000),
+				defs = origin.append('defs'),
+				svg = origin.append('g').attr("transform","translate("+mmargin*2+","+mmargin*2+")");
+
+			var line_num = 10,
+				bg_line_groups = [];
+
+			for(var key in bg_lines){
+				var g_lines = [];
+				for(var gi = 0; gi<3; gi++){
+					var t_lines = [bg_lines[key]];
+					for(var i = 0; i<line_num; i++){
+						t_lines.push(bg_lines[key]);
+					}
+					g_lines.push(t_lines);
+				}
+				bg_line_groups.push(g_lines);
+			}
+
+			var line_groups = svg.selectAll('g.bg_line_groups').data(bg_line_groups).enter().append('g')
+				.attr("class","bg_line_groups")
+				.attr("transform", function(d, i){ return "translate(0,"+((cats.length*(height+vmargin)+gheight+vmargin)*i)+")"; });
+
+			var line_block = line_groups.selectAll('g').data(function(d){ return d; }).enter().append('g')
+				.attr("transform", function(d, i){ return "translate(0,"+(vmargin+height)*i+")"; });
+
+			line_block.selectAll('line').data(function(d){ return d; }).enter().append('line')
+				.attr("x1", function(d){ return d.min*(width+hmargin); })
+				.attr("x2", function(d){ return (d.max+1)*(width+hmargin)-hmargin; })
+				.attr("y1", function(d,j){ return (height / line_num)*j; })
+				.attr("y2", function(d,j){ return (height / line_num)*j; });
+
+				line_block.selectAll("rect").data([0,1,2,3,4,5,6,7]).enter().append("rect")
+					.attr("class", "whiteover")
+					.attr("x",function(d){ return (d*(width+hmargin))+width; })
+					.attr("y",-2)
+					.attr("width",hmargin)
+					.attr("height",height+4);
+
+			function log(n, el){
+				return Math.sqrt(n / max[el]);
+			}
+
+			function logr(n, el){
+				return n/maxr;
+			}
+
+			function timer(){
+
+			}
+
+			function iqr(k) {
+				return function(d, i) {
+					var q1 = d.quartiles[0],
+						q3 = d.quartiles[2],
+						iqr = (q3 - q1) * k,
+						i = -1,
+						j = d.length;
+
+					while (d[++i] < q1 - iqr);
+					while (d[--j] > q3 + iqr);
+
+					return [i, j];
+				};
+			}
+
+			function barBlock(el, i, b, d){
+				var sels = [];
+				d.forEach(function(sel, si, sarr){
+					if(sel>0){
+						sels.push({
+							i:si,
+							c:sel
+						});
+						g[el][b].append("g")
+							.attr("transform","translate("+(si*barsize)+","+(height-y[el](log(sel,el)))+")")
+							.append("rect")
+								.attr("width",barsize-1)
+								.attr("height",y[el](log(sel,el)))
+								.attr("class", colors[rcats[el]]);
+						g[el][b].append("g")
+							.attr("transform","translate("+(si*barsize)+","+(height-y[el](logr(sel,el)))+")")
+							.append("rect")
+								//.attr("opacity",0.5)
+								.attr("width",barsize-1)
+								.attr("height",y[el](logr(sel,el)))
+								.attr("class", colors[rcats[el]]);
+					}
+				});
+				var bracket_offset = 2, bracket_sum = 0;
+				var yh = height-y[el](logr(d3.max(sels, function(d){return d.c;}), el))-bracket_offset,
+					y0 = 0,y1 = 0,x0 = 0,x1 = 0;
+				sels.forEach(function(sel, si, arr){
+					bracket_sum += sel.c;
+					if(x0===0){
+						x0 = sel.i*barsize-bracket_offset;
+						y0 = height-y[el](logr(sel.c,el))+bracket_offset*2;
+					}
+					x1 = (sel.i+1)*barsize+bracket_offset-1;
+					y1 = height-y[el](logr(sel.c,el))+bracket_offset*2;
+				});
+
+				var pg = g[el][b].append("g").attr("class", "bracket el-"+el);
+
+				pg.append("line")
+					.attr("x1",x0)
+					.attr("x2",x0)
+					.attr("y1",y0)
+					.attr("y2",yh);
+
+				pg.append("line")
+					.attr("x1",x1)
+					.attr("x2",x1)
+					.attr("y1",y1)
+					.attr("y2",yh);
+
+				pg.append("line")
+					.attr("x1",x0)
+					.attr("x2",x1)
+					.attr("y1",yh)
+					.attr("y2",yh);
+
+				pg.append("text").text(bracket_sum).attr("text-anchor","middle").attr("x",((x1-x0)/2+x0)).attr("y",yh-8);
+			}
+
+			function descriptors(d){
+				var results = {};
+				cats.forEach(function(el, i, arr){
+					results[el] = [];
+					for(var b = 0; b<bins; b++){
+						results[el].push(0);
+					}
+				});
+
+				cats.forEach(function(el, i, arr){
+					d.forEach(function(sel, si, sarr){
+						if(sel["cat_"+el] > 0){
+							var id = Math.ceil(sel["cat_"+el] / histograms[el].binsize)-1;
+							if(id>=bins){id--;}
+							results[el][id]++;
+						}
+					});
+				});
+				return results;
+			}
+
+			function buildBoxBg(el, i, label){
+				box[el][i].append("rect")
+					.attr("class","boxbgbar")
+					.attr("x",0)
+					.attr("y",0)
+					.attr("width",boxwidth/2)
+					.attr("height",height*3+vmargin*2);
+
+				if(label){
+					box[el][i].append("text")
+						.attr("text-anchor", "middle")
+						.attr("x",boxwidth/4)
+						.attr("y",-5)
+						.text(time_max+"ms");
+
+					box[el][i].append("text")
+						.attr("text-anchor", "middle")
+						.attr("x",boxwidth/4)
+						.attr("y",height*3+vmargin*2+16)
+						.text("0ms");
+				}
+			}
+
+			function buildBoxLabel(el, i, data){
+				box[el][i].append("text")
+					.attr("text-anchor", (i===1)?"middle":"start")
+					.attr("x",(i===1)?boxwidth/4:boxwidth/2+4)
+					.attr("y",(height*3+vmargin*2) - (d3.median(data)/time_max)*(height*3+vmargin*2) + ((i===1)?-8:3))
+					.text(formatTime(d3.median(data)));
+			}
+
+			function formatTime(t){
+				if(t>=1000){
+					return (t/1000).toFixed(1)+"k";
+				}else{
+					return t;
+				}
+			}
+
+			function createLabel(el, i, b){
+				barlabel[el][b].append("text").text(max[el])
+					.attr("class", "col-"+b)
+					.attr("text-anchor", "middle")
+					.attr("transform", "translate(0, -5)");
+				if(b>0){
+					barlabel[el][b].append("text").text(maxr)
+						.attr("class", "el-"+el)
+						.attr("text-anchor", "middle")
+						.attr("transform", "translate(-1, -5)");
+				}
+			}
+
+			var time_max = 0, descriptor_max = 0;
+
+			d3.json('../10_histograms.json', function(data){
+				histograms = data;
+				d3.json('bezirke.topojson', function(bezirke){
+					for(var b = 0; b<cols; b++){
+						msk[b] = defs.append("clipPath") //mask
+							.attr("id","mapMask_"+b)
+								.append("rect")
+									.attr("class","rectmask")
+									.attr("x",0)
+									.attr("y",0)
+									.attr("width",gwidth)
+									.attr("height",gheight);
+
+						m[b] = svg.append("g").style("clip-path","url(#mapMask_"+b+")").attr("transform", "translate("+(grid_pos[b][0])*(width+hmargin)+","+((cats.length*(height+vmargin)+gheight+vmargin)*(grid_pos[b][1]+1)-gheight-vmargin)+")");
+						m[b].selectAll('path').data(topojson.feature(bezirke, bezirke.objects.berlin_bezirke).features).enter().append("path")
+							.attr("class","bezirke")
+							.attr("d", (b===0)?opath:path);
+						m[b].append("rect").attr("x",0).attr("y",0).attr("width",gwidth).attr("height",gheight).attr("class","mapborder mapborder-"+b).attr("transform",(b===0)?"translate(96,79) scale(0.36)":"");
+
+						cats.forEach(function(el, i, arr){
+							max[el] = d3.max(histograms[el].bins);
+							y[el] = d3.scale.linear().domain([0,1]).range([0,height]);
+							if(!(el in g)){
+								g[el] = {};
+								box[el] = {};
+								boxbg[el] = {};
+								barlabel[el] = {};
+							}
+							g[el][b] = svg.append("g").attr("class", "bg bg-"+b).attr("transform","translate("+(grid_pos[b][0])*(width+hmargin)+","+(((cats.length*(height+vmargin)+gheight+vmargin)*(grid_pos[b][1]))+i*(height+vmargin))+")");
+							
+							g[el][b].append("line").attr("x1",0).attr("x2",width-1).attr("y1",(height+2)).attr("y2",(height+2)).attr("class", "x-axis-horizontal");
+							g[el][b].append("line").attr("x1",0).attr("x2",0).attr("y1",(0)).attr("y2",(height+2)).attr("class", "x-axis-horizontal");
+
+							for(var a = 0; a<=5; a++){
+								g[el][b].append("line").attr("x1",-3).attr("x2",1).attr("y1",(((height+2)/5)*a)).attr("y2",(((height+2)/5)*a)).attr("class", "x-axis-horizontal");
+							}
+
+
+							box[el][b] = g[el][b].append("g").attr("class","box").attr("transform","translate("+(width+10+((boxwidth+10)*i))+","+(-i*(height+vmargin))+")");
+							boxbg[el][b] = g[el][b].append("g").attr("class","boxbg").attr("transform","translate("+(width+10+((boxwidth+10)*i))+","+(-i*(height+vmargin))+")");
+							barlabel[el][b] = g[el][b].append("g").attr("class","barlabel");
+
+							histograms[el].bins.forEach(function(sel, si, sarr){
+								g[el][b].append("g").attr("transform","translate("+(si*barsize)+","+(height-y[el](log(sel,el)))+")").append("rect").attr("width",barsize-1).attr("height",y[el](log(sel,el)));
+							});
+							(d3.range(0,(histograms[el].bins.length+1),1)).forEach(function(sel, si, sarr){
+								g[el][b].append("g").attr("class","x-axis").attr("transform","translate("+(si*barsize)+","+(height+17)+")").append("text").text(function(){
+									var r = (histograms[el].binsize*si).toFixed(1);
+									if(si === 0){
+										r = ">"+r;
+									}
+									return r;
+								}).attr("text-anchor","middle");
+							});
+							(d3.range(0,(histograms[el].bins.length+1),1)).forEach(function(sel, si, sarr){
+								g[el][b].append("g").attr("class","x-axis-tick").attr("transform","translate("+(si*barsize)+","+(height+1)+")").append("line")
+									.attr("x1",0)
+									.attr("x2",0)
+									.attr("y1",0)
+									.attr("y2",5);
+							});
+						});
+					}
+
+					d3.json('../clusterPerformance.json', function(cluster){
+
+						cats.forEach(function(el, i, arr){
+							createLabel(el, i, 0);
+						});
+
+						for(var key in cluster){
+							if(("test" in cluster[key])){
+								time_max = d3.max([time_max, d3.max(cluster[key].test, function(d){return parseFloat(d.time);})]);
+							}else{
+								for(var kkey in cluster[key]){
+									time_max = d3.max([time_max, d3.max(cluster[key][kkey].test, function(d){return parseFloat(d.time);})]);
+								}
+							}
+						}
+
+						/*var boxmax = 0;
+						cats.forEach(function(el, i, arr){
+							var tmax = d3.max(cluster.individual[el].test, function(d,i){ return (i>0)?parseFloat(d.time):0;});
+							boxmax = (tmax>boxmax)?tmax:boxmax;
+						});*/
+						chart.domain([0, time_max]);
+
+						//individual
+						cats.forEach(function(el, i, arr){
+							var dscrptrs = descriptors(cluster.individual[el].descriptors);
+
+							barBlock(el, i, 1, dscrptrs[el]);
+							createLabel(el, i, 1);
+
+							var time_d = [];
+
+							cluster.individual[el].test.forEach(function(sel, si, sarr){
+								if(si > 0){
+									time_d.push(parseFloat(sel.time));
+								}
+							});
+
+							buildBoxBg(el, 1, (el===26)?true:false);
+							buildBoxLabel(el, 1, time_d);
+							box[el][1].data([time_d]).call(chart);
+
+							cluster.individual[el].result.forEach(function(sel, si, sarr){
+								var p = projection([sel.longitude, sel.latitude]);
+								m[1].append('circle').attr('cx', p[0]).attr('cy', p[1]).attr("r", 4).attr("class",colors[i]);
+							});
+
+						});
+
+						//parallel
+						([[52,26],[52,194],[26,194]]).forEach(function(el, i, arr){
+							var key = el[0]+"_"+el[1];
+							var dscrptrs = descriptors(cluster.parallel[key].descriptors);
+
+							barBlock(el[0], 0, 2+i, dscrptrs[el[0]]);
+							createLabel(el[0], 0, 2+i);
+							barBlock(el[1], 1, 2+i, dscrptrs[el[1]]);
+							createLabel(el[1], 1, 2+i);
+
+							/*boxmax = 0;
+							var tmax = d3.max(cluster.parallel[key].test, function(d,i){ return (i>0)?parseFloat(d.time):0;});
+							boxmax = (tmax>boxmax)?tmax:boxmax;*/
+							chart.domain([0, time_max]);
+
+							var time_d = [];
+
+							cluster.parallel[key].test.forEach(function(sel, si, sarr){
+								if(si > 0){
+									time_d.push(parseFloat(sel.time));
+								}
+							});
+							buildBoxBg(26, 2+i, true);
+							buildBoxLabel(26, 2+i, time_d);
+							box[26][2+i].data([time_d]).call(chart);
+
+							cluster.parallel[key].result.forEach(function(sel, si, sarr){
+								var p = projection([sel.longitude, sel.latitude]);
+								m[2+i].append('circle').attr('cx', p[0]).attr('cy', p[1]).attr("r", 4).attr("class",colors[rcats[sel.categories_id]]);
+							});
+
+						});
+
+						//all_parallel
+						var dscrptrs = descriptors(cluster.all_parallel.descriptors);
+
+						barBlock(cats[0], 0, 5, dscrptrs[cats[0]]);
+						createLabel(cats[0], 0, 5);
+						barBlock(cats[1], 1, 5, dscrptrs[cats[1]]);
+						createLabel(cats[1], 1, 5);
+						barBlock(cats[2], 2, 5, dscrptrs[cats[2]]);
+						createLabel(cats[2], 2, 5);
+
+						/*boxmax = 0;
+						var tmax = d3.max(cluster.all_parallel.test, function(d,i){ return (i>0)?parseFloat(d.time):0;});
+						boxmax = (tmax>boxmax)?tmax:boxmax;*/
+						chart.domain([0, time_max]);
+
+						var time_d = [];
+
+						cluster.all_parallel.test.forEach(function(sel, si, sarr){
+							if(si > 0){
+								time_d.push(parseFloat(sel.time));
+							}
+						});
+						buildBoxBg(26, 5, true);
+						buildBoxLabel(26, 5, time_d);
+						box[26][5].data([time_d]).call(chart);
+
+						cluster.all_parallel.result.forEach(function(sel, si, sarr){
+							var p = projection([sel.longitude, sel.latitude]);
+							m[5].append('circle').attr('cx', p[0]).attr('cy', p[1]).attr("r", 4).attr("class",colors[rcats[sel.categories_id]]);
+						});
+
+						//twostep_prio_bins
+						([[52,26],[52,194],[26,194],[26,52],[194,52],[194,26]]).forEach(function(el, i, arr){
+							var key = el[0]+"_"+el[1];
+							var dscrptrs = descriptors(cluster.twostep_prio_bins[key].descriptors);
+
+							barBlock(el[0], 0, 6+i, dscrptrs[el[0]]);
+							createLabel(el[0], 0, 6+i);
+							barBlock(el[1], 1, 6+i, dscrptrs[el[1]]);
+							createLabel(el[1], 1, 6+i);
+
+							/*boxmax = 0;
+							var tmax = d3.max(cluster.twostep_prio_bins[key].test, function(d,i){ return (i>0)?parseFloat(d.time):0;});
+							boxmax = (tmax>boxmax)?tmax:boxmax;*/
+							chart.domain([0, time_max]);
+
+							var time_d = [];
+
+							cluster.twostep_prio_bins[key].test.forEach(function(sel, si, sarr){
+								if(si > 0){
+									time_d.push(parseFloat(sel.time));
+								}
+							});
+							buildBoxBg(26, 6+i, true);
+							buildBoxLabel(26, 6+i, time_d);
+							box[26][6+i].data([time_d]).call(chart);
+
+							cluster.twostep_prio_bins[key].result.forEach(function(sel, si, sarr){
+								var p = projection([sel.longitude, sel.latitude]);
+								m[6+i].append('circle').attr('cx', p[0]).attr('cy', p[1]).attr("r", 4).attr("class",colors[rcats[sel.categories_id]]);
+							});
+
+						});
+
+						//twostep_prio_cont
+						([[52,26],[52,194],[26,194],[26,52],[194,52],[194,26]]).forEach(function(el, i, arr){
+							var key = el[0]+"_"+el[1];
+							var dscrptrs = descriptors(cluster.twostep_prio_cont[key].descriptors);
+
+							barBlock(el[0], 0, 12+i, dscrptrs[el[0]]);
+							createLabel(el[0], 0, 12+i);
+							barBlock(el[1], 1, 12+i, dscrptrs[el[1]]);
+							createLabel(el[1], 1, 12+i);
+
+							/*boxmax = 0;
+							var tmax = d3.max(cluster.twostep_prio_cont[key].test, function(d,i){ return (i>0)?parseFloat(d.time):0;});
+							boxmax = (tmax>boxmax)?tmax:boxmax;*/
+							chart.domain([0, time_max]);
+
+							var time_d = [];
+
+							cluster.twostep_prio_cont[key].test.forEach(function(sel, si, sarr){
+								if(si > 0){
+									time_d.push(parseFloat(sel.time));
+								}
+							});
+							buildBoxBg(26, 12+i, true);
+							buildBoxLabel(26, 12+i, time_d);
+							box[26][12+i].data([time_d]).call(chart);
+
+							cluster.twostep_prio_cont[key].result.forEach(function(sel, si, sarr){
+								var p = projection([sel.longitude, sel.latitude]);
+								m[12+i].append('circle').attr('cx', p[0]).attr('cy', p[1]).attr("r", 4).attr("class",colors[rcats[sel.categories_id]]);
+							});
+
+						});
+
+						//threestep_prio_bins
+						([[26,52,194],[26,194,52],[52,26,194],[52,194,26],[194,26,52],[194,52,26]]).forEach(function(el, i, arr){
+							var key = el[0]+"_"+el[1]+"_"+el[2];
+							var dscrptrs = descriptors(cluster.threestep_prio_bins[key].descriptors);
+
+							barBlock(el[0], 0, 18+i, dscrptrs[el[0]]);
+							createLabel(el[0], 0, 18+i);
+							barBlock(el[1], 1, 18+i, dscrptrs[el[1]]);
+							createLabel(el[1], 1, 18+i);
+							barBlock(el[2], 2, 18+i, dscrptrs[el[2]]);
+							createLabel(el[2], 2, 18+i);
+
+							/*boxmax = 0;
+							var tmax = d3.max(cluster.threestep_prio_bins[key].test, function(d,i){ return (i>0)?parseFloat(d.time):0;});
+							boxmax = (tmax>boxmax)?tmax:boxmax;*/
+							chart.domain([0, time_max]);
+
+							var time_d = [];
+
+							cluster.threestep_prio_bins[key].test.forEach(function(sel, si, sarr){
+								if(si > 0){
+									time_d.push(parseFloat(sel.time));
+								}
+							});
+							buildBoxBg(26, 18+i, true);
+							buildBoxLabel(26, 18+i, time_d);
+							box[26][18+i].data([time_d]).call(chart);
+
+							cluster.threestep_prio_bins[key].result.forEach(function(sel, si, sarr){
+								var p = projection([sel.longitude, sel.latitude]);
+								m[18+i].append('circle').attr('cx', p[0]).attr('cy', p[1]).attr("r", 4).attr("class",colors[rcats[sel.categories_id]]);
+							});
+
+						});
+
+						//threestep_prio_cont
+						([[26,52,194],[26,194,52],[52,26,194],[52,194,26],[194,26,52],[194,52,26]]).forEach(function(el, i, arr){
+							var key = el[0]+"_"+el[1]+"_"+el[2];
+							var dscrptrs = descriptors(cluster.threestep_prio_cont[key].descriptors);
+
+							barBlock(el[0], 0, 24+i, dscrptrs[el[0]]);
+							createLabel(el[0], 0, 24+i);
+							barBlock(el[1], 1, 24+i, dscrptrs[el[1]]);
+							createLabel(el[1], 1, 24+i);
+							barBlock(el[2], 2, 24+i, dscrptrs[el[2]]);
+							createLabel(el[2], 2, 24+i);
+
+							/*boxmax = 0;
+							var tmax = d3.max(cluster.threestep_prio_cont[key].test, function(d,i){ return (i>0)?parseFloat(d.time):0;});
+							boxmax = (tmax>boxmax)?tmax:boxmax;*/
+							chart.domain([0, time_max]);
+
+							var time_d = [];
+
+							cluster.threestep_prio_cont[key].test.forEach(function(sel, si, sarr){
+								if(si > 0){
+									time_d.push(parseFloat(sel.time));
+								}
+							});
+							buildBoxBg(26, 24+i, true);
+							buildBoxLabel(26, 24+i, time_d);
+							box[26][24+i].data([time_d]).call(chart);
+
+							cluster.threestep_prio_cont[key].result.forEach(function(sel, si, sarr){
+								var p = projection([sel.longitude, sel.latitude]);
+								m[24+i].append('circle').attr('cx', p[0]).attr('cy', p[1]).attr("r", 4).attr("class",colors[rcats[sel.categories_id]]);
+							});
+
+						});
+
+					});
+				});
+			});
+
+	    </script>
+	</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - geometry - vertex colors</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #808080;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			a {
+
+				color: #0080ff;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<script src="libs/three/three.min.js"></script>
+		<script src="libs/jquery-1.11.1.min.js"></script>
+		<script>
+
+            var json;
+
+            $.getJSON( "../delaunay/delaunay.json", function( data ) {
+                json = data;
+                init();
+                animate();
+            });
+
+			var container;
+
+			var scene, renderer;
+
+			var mesh, group1, group2, group3, light;
+
+			var mouseX = 0, mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+            function getColor(val){
+                val -= json.min;
+                val = val / (/*json.max*/50-json.min);
+                if(val>1){val=1;}
+
+                var c1 = [222, 0, 0],
+                    //c2 = [141, 5, 196];
+                    c2 = [255, 255, 255];
+
+                return [
+                    Math.round(c1[0]+(c2[0]-c1[0])*(val)),
+                    Math.round(c1[1]+(c2[1]-c1[1])*(val)),
+                    Math.round(c1[2]+(c2[2]-c1[2])*(val))
+                ];
+            }
+
+			function init() {
+
+                console.log(json);
+
+				container = document.getElementById( 'container' );
+
+				camera = new THREE.PerspectiveCamera( 20, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 1800;
+
+				scene = new THREE.Scene();
+
+                var light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0, 0, 1 );
+				scene.add( light );
+
+				var canvas = document.createElement( 'canvas' );
+				canvas.width = 128;
+				canvas.height = 128;
+
+				var context = canvas.getContext( '2d' );
+
+                var geometry = new THREE.Geometry();
+                geometry.verticesNeedUpdate = true;
+
+                var offset_x = -500,
+                    offset_y = -100;
+
+                for(var i = 0; i<json.data.length; i++){
+                    geometry.vertices.push(   new THREE.Vector3(
+                        ((json.data[i].lng-json.lng_min)/100)+offset_x,
+                        ((json.data[i].lat-json.lat_min)/100)+offset_y,
+                        0
+                    ) );
+                    var c = new THREE.Color( 0xffffff );
+                    var color = getColor(json.data[i].val);
+                    c.setRGB(color[0]/255,color[1]/255,color[2]/255);
+                    geometry.colors.push(c);
+                }
+
+
+                for(var i = 0; i<json.triangles.length; i+=3){
+                    geometry.faces.push( new THREE.Face3( json.triangles[i], json.triangles[i+1], json.triangles[i+2]) );
+                }
+
+                var faceIndices = ['a', 'b', 'c'];
+
+                for ( var i = 0; i < geometry.faces.length; i++ ){
+                    face = geometry.faces[ i ];
+                    numberOfSides = ( face instanceof THREE.Face3 ) ? 3 : 4;
+                    for( var j = 0; j < numberOfSides; j++ )
+                    {
+                        vertexIndex = face[ faceIndices[ j ] ];
+                        face.vertexColors[ j ] = geometry.colors[ vertexIndex ];
+                    }
+                }
+
+                //geometry.computeFaceNormals();
+                //geometry.computeVertexNormals();
+
+                var mat = [
+                    //, vertexColors: THREE.VertexColors
+                    //new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading, shininess: 0, side:THREE.DoubleSide } )
+                    new THREE.MeshBasicMaterial({ vertexColors:THREE.VertexColors, side:THREE.DoubleSide })
+                    //,
+					//new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true, transparent: true } )
+                ]
+                ;
+
+
+
+                var triangles = THREE.SceneUtils.createMultiMaterialObject( geometry, mat );
+                //triangles.rotation.x = Math.PI/2;
+                scene.add(triangles);
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( 0xffffff );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+				//requestAnimationFrame( animate );
+				render();
+			}
+
+			function render() {
+				camera.lookAt( scene.position );
+				renderer.render( scene, camera );
+			}
+
+		</script>
+
+	</body>
+</html>

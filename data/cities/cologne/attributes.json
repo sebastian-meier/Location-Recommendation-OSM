@@ -1,0 +1,201 @@
+{
+	"0": {
+		"value": "Wohnbaufläche",
+		"keys": {
+			"TYP": "W",
+			"LABEL1": "W",
+			"Langname": "Wohnbaufläche",
+			"subtype": "1"
+		}
+	},
+	"1": {
+		"value": "Besonderes Wohngebiet",
+		"keys": {
+			"TYP": "WB",
+			"LABEL1": "WB",
+			"Langname": "Besonderes Wohngebiet",
+			"subtype": "1"
+		}
+	},
+	"2": {
+		"value": "Mischfläche",
+		"keys": {
+			"TYP": "M",
+			"LABEL1": "M",
+			"Langname": "Gewerbefläche",
+			"subtype": "1"
+		}
+	},
+	"3": {
+		"value": "Gewerbefläche",
+		"keys": {
+			"TYP": "GE",
+			"LABEL1": "GE",
+			"Langname": "Industriefläche",
+			"subtype": "1"
+		}
+	},
+	"4": {
+		"value": "Industriefläche",
+		"keys": {
+			"TYP": "GI",
+			"LABEL1": "GI",
+			"subtype": "1"
+		}
+	},
+	"5": {
+		"value": "Grünfläche mit tw. landwirtschftl. Nutzung",
+		"keys": {
+			"TYP": "Grün",
+			"Langname": "Fläche für die Landwirtschaft",
+			"subtype": "1"
+		}
+	},
+	"6": {
+		"value": "Fläche für die Landwirtschaft",
+		"keys": {
+			"TYP": "Landwi",
+			"Langname": "Wasserfläche",
+			"subtype": "1"
+		}
+	},
+	"7": {
+		"value": "Fläche für die Forstwirtschaft, Erholungswald",
+		"keys": {
+			"TYP": "Wald",
+			"Langname": "Fläche für Ver- und Entsorgung",
+			"subtype": "1"
+		}
+	},
+	"8": {
+		"value": "Wasserfläche",
+		"keys": {
+			"TYP": "Wasser",
+			"LABEL1": "S",
+			"Langname": "Sonderbaufläche",
+			"subtype": "1"
+		}
+	},
+	"9": {
+		"value": "Fläche für Ver- und Entsorgung",
+		"keys": {
+			"TYP": "Versorg",
+			"Langname": "Gemeinbedarfsfläche",
+			"subtype": "1"
+		}
+	},
+	"10": {
+		"value": "Sonderbaufläche allgemein",
+		"keys": {
+			"TYP": "S",
+			"LABEL1": "S",
+			"subtype": "1"
+		}
+	},
+	"11": {
+		"value": "Gemeinbedarfsfläche",
+		"keys": {
+			"TYP": "GBFL",
+			"Langname": "Fläche für die Luftfahrt",
+			"subtype": "1"
+		}
+	},
+	"12": {
+		"value": "Fläche für Bahnanlagen",
+		"keys": {
+			"TYP": "bahn",
+			"LABEL1": "M",
+			"Langname": "Gemischte Baufläche",
+			"subtype": "1"
+		}
+	},
+	"13": {
+		"value": "Fläche für Hauptverkehrszüge",
+		"keys": {
+			"TYP": "NS",
+			"subtype": "1"
+		}
+	},
+	"14": {
+		"value": "Fläche für den Luftverkehr",
+		"keys": {
+			"TYP": "Flug",
+			"LABEL1": "MK",
+			"subtype": "1"
+		}
+	},
+	"15": {
+		"value": "Kerngebiet",
+		"keys": {
+			"TYP": "MK",
+			"LABEL1": "MK",
+			"Langname": "Mischgebiet",
+			"subtype": "1"
+		}
+	},
+	"16": {
+		"value": "Mischgebiet",
+		"keys": {
+			"TYP": "MI",
+			"LABEL1": "MI",
+			"Langname": "Sonderbaufläche",
+			"subtype": "1"
+		}
+	},
+	"17": {
+		"value": "Sonderbaufläche mit Zweckbestimmung",
+		"keys": {
+			"TYP": "SO",
+			"ZWECK": "Zweck eintragen",
+			"LABEL1": "SO",
+			"subtype": "1"
+		}
+	},
+	"18": {
+		"value": "Sonderbaufläche großflächiger Einzelhandel",
+		"keys": {
+			"TYP": "SO",
+			"ZWECK": "grfl. Einz.handel",
+			"LABEL1": "SO*",
+			"subtype": "1"
+		}
+	},
+	"19": {
+		"value": "Wohnbaufläche zurückgestellt",
+		"keys": {
+			"TYP": "W",
+			"LABEL1": "W",
+			"TYPspezial": "zurückgestellt"
+		}
+	},
+	"20": {
+		"value": "Fläche für Windenergieanlagen",
+		"keys": {
+			"TYP": "WEA",
+			"LABEL1": "WEA",
+			"subtype": "1"
+		}
+	},
+	"21": {
+		"value": "Sanierungsgebiet",
+		"keys": {
+			"TYP": "San",
+			"LABEL1": "San"
+		}
+	},
+	"22": {
+		"value": "Grünfläche mit besonderer Nutzung",
+		"keys": {
+			"TYP": "GrünSpezial",
+			"TYPspezial": "hier eintragen",
+			"subtype": "0"
+		}
+	},
+	"23": {
+		"value": "Waldfläche mit besonderer Nutzung",
+		"keys": {
+			"TYP": "Wald spezial",
+			"TYPspezial": "Eintragen"
+		}
+	}
+}

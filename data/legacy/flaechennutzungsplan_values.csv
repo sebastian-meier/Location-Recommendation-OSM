@@ -1,0 +1,246 @@
+Level2Short;Level2;Level1Short;Level1;Original;Origin;Subtype1;Subtype2
+;;NAN;undefined;null;Berlin;;
+;;WHN;Wohnen;Wohnnutzung;Berlin;;
+;;VES;Versorgung;Ver- und Entsorgungseinrichtungen;Berlin;;
+;;GWB;Gewerbe;Gewerbe- und Industrienutzung, großflächiger Einzelhandel;Berlin;;
+;;KRN;Kern;Kerngebietsnutzungen;Berlin;;
+;;MSH;Misch;Mischnutzung;Berlin;;
+;;GMB;Gemeinbedarf;Gemeinbedarfs- und Sondernutzungen;Berlin;;
+;;GWB;Gewerbe;Gewerbe- und Industrienutzung, großflächiger Einzelhandel;Berlin;;
+;;WHN;Wohnen;Wochenendhäuser und kleingartenähnliche Nutzungen;Berlin;;
+;;VRK;Verkehr;Verkehrsflächen;Berlin;;
+GSD;Gesundheit;GMB;Gemeinbedarf;Krankenhaus;Berlin;;
+;;VRK;Verkehr;sonstige Verkehrsflächen (z.B. Verkehrsinseln etc.);Berlin;;
+;;WHN;Wohnen;GeschossWohnungsbau der 1990er Jahre und jünger (1990er bis heute);Berlin;;
+;;WHN;Wohnen;Großsiedlungen und Punkthochhäuser (1960er-1980er) 4–11-geschossig;Berlin;;
+;;GRF;Grünfläche;Grünanlage/Park;Berlin;;
+;;WHN;Wohnen;Geschlossene Blockbebauung Hinterhof (1870er-1918) 5-geschossig;Berlin;;
+;;WHN;Wohnen;Entkernte Blockrandbebauung Lückenschluss nach 1945;Berlin;;
+KLT;Kultur;FRZ;Freizeit;Kultur;Berlin;;
+;;IND;Infrastruktur;Verwaltung;Berlin;;
+BRH;Brache;FRF;Freifläche;Brachfläche;Berlin;;
+;;GWB;Gewerbe;Gewerbe- und Industriegebiet großflächiger Einzelhandel dichte Bebauung;Berlin;;
+;;KRN;Kern;Kerngebiet;Berlin;;
+;;FRZ;Freizeit;Stadtplatz/Promenade;Berlin;;
+;;GWB;Gewerbe;Gewerbe- und Industriegebiet großflächiger Einzelhandel geringe Bebauung;Berlin;;
+;;MSH;Misch;Mischbebauung halboffener und offener Schuppenhof 2-4-geschossig;Berlin;;
+;;FDH;Friedhof;Friedhof;Berlin;;
+BLD;Bildung;SND;Sonder;Hochschule und Forschung;Berlin;;
+BLD;Bildung;SND;Sonder;Altbau-Schule (vor 1945);Berlin;;
+IFS;Infrastruktur;GMB;Gemeinbedarf;Sicherheit und Ordnung;Berlin;;
+;;VES;Versorgung;Flächen der Ver- und Entsorgung;Berlin;;
+BLD;Bildung;GMB;Gemeinbedarf;Kindertagesstätte;Berlin;;
+;;MSH;Misch;Heterogene innerstädtische Mischbebauung Lückenschluss nach 1945;Berlin;;
+;;MSH;Misch;Mischgebiet ohne Wohngebietscharakter dichte Bebauung;Berlin;;
+;;WSR;Wasser;Gewässer;Berlin;;
+;;BHN;Bahn;Gleiskörper;Berlin;;
+;;WHN;Wohnen;Blockrandbebauung mit Großhöfen (1920er-1940er) 3–5-geschossig;Berlin;;
+;;WHN;Wohnen;Freie Zeilenbebauung (1950er-1970er) mit landschaftlichem Siedlungsgrün 3–6-geschossig;Berlin;;
+SPT;Sport;FRZ;Freizeit;Sportanlage ungedeckt;Berlin;;
+BLD;Bildung;GMB;Gemeinbedarf;Neubau-Schule (nach 1945);Berlin;;
+;;GMB;Gemeinbedarf;Sonstige Gemeinbedarfs- und Sondergebiete;Berlin;;
+RLG;Religion;GMB;Gemeinbedarf;Kirche;Berlin;;
+;;WHN;Wohnen;Geschlossene und halboffene Blockbebauung Schmuck- und Gartenhof (1870er-1918) 4-geschossig;Berlin;;
+;;WHN;Wohnen;Dichte Blockbebauung geschlossener Hinterhof (1870er-1918) 5-6-geschossig;Berlin;;
+;;BHN;Bahn;Bahnhof und Bahnanlage ohne Gleiskörper;Berlin;;
+;;WHN;Wohnen;Parallele Zeilenbebauung mit architektonischem Zeilengrün (1920er bis 1930er) 3 – 5-geschossig;Berlin;;
+PRK;Parken;VRK;Verkehr;Parkplatz;Berlin;;
+BLD;Bildung;GMB;Gemeinbedarf;Sonstige Jugendeinrichtungen;Berlin;;
+;;MSH;Misch;Mischgebiet ohne Wohngebietscharakter geringe Bebauung;Berlin;;
+;;WHN;Wohnen;Kleingartenanlage allgemein;Berlin;;
+;Wald;GRF;Grünfläche;Wald;Berlin;;
+SPT;Sport;FRZ;Freizeit;Sportanlage gedeckt;Berlin;;
+;;WHN;Wohnen;Villen und Stadtvillen mit parkartigem Garten (überwiegend 1870er-1945);Berlin;;
+;;GWB;Gewerbe;Baumschule/Gartenbau;Berlin;;
+;;WHN;Wohnen;Wochenendhäuser und kleingartenartige Gebiete;Berlin;;
+;;WHN;Wohnen;Reihen- und Doppelhäuser mit Garten;Berlin;;
+;;WHN;Wohnen;Freistehende Einfamilienhäuser mit Garten;Berlin;;
+;;WHN;Wohnen;Verdichtung in Einzelhausgebieten Mischbebauung mit Gärten und halbprivater Umgrünung (1870er bis heute);Berlin;;
+;;LWT;Landwirtschaft;Landwirtschaft;Berlin;;
+ODR;Outdoor;FRZ;Freizeit;Campingplatz;Berlin;;
+;Dorf;WHN;Wohnen;Dörfliche Mischbebauung;Berlin;;
+;;LVK;Luftverkehr;Flughafen;Berlin;;
+;;GRF;Grünfläche;Park / Grünfläche;Berlin;;
+BRH;Brache;FRF;Freifläche;Brachfläche vegetationsfrei;Berlin;;
+;;FRZ;Freizeit;Stadtplatz / Promenade;Berlin;;
+;;FDH;Friedhof;Friedhof;Berlin;;
+BRN;Brache;GRF;Grünfläche;Brachfläche Mischbestand aus Wiesen Gebüsch und Bäumen;Berlin;;
+;;WSR;Wasser;Gewässer;Berlin;;
+SPT;Sport;FRZ;Freizeit;Sportnutzungen;Berlin;;
+BRH;Brache;GRF;Grünfläche;Brachfläche wiesenartiger Vegetationsbestand;Berlin;;
+;;WHN;Wohnen;Kleingarten;Berlin;;
+;;GWB;Gewerbe;Baumschule / Gartenbau;Berlin;;
+WLD;Wald;GWB;Grünfläche;Wälder und Forsten;Berlin;;
+;;LWT;Landwirtschaft;Ackerland;Berlin;;
+;;GRF;Grünfläche;Grünland;Berlin;;
+NTR;Natur;GRF;Grünfläche;Naturbestimmte Flächen;Hamburg;;
+;;WSR;Wasser;Wasserflächen;Hamburg;;
+;;HFN;Hafen;Hafen*;Hamburg;;
+;;LWT;Landwirtschaft;Flächen für die Landwirtschaft;Hamburg;;
+BAU;Bau;WHN;Wohnen;Bauflächen mit Dorf- oder Wohngebietscharakter;Hamburg;;
+;;GRF;Grünfläche;Grünflächen;Hamburg;;
+;;GMB;Gemeinbedarf;Flächen für den Gemeinbedarf;Hamburg;;
+WLD;Wald;GRF;Grünfläche;Wald;Hamburg;;
+;;GWB;Gewerbe;Gewerbliche Bauflächen*;Hamburg;;
+;;VES;Versorgung;Flächen für Versorgungsanlagen oder die Verwertung oder Beseitugung von Abwasser und festen Abfallstoffen*;Hamburg;;
+;;WHN;Wohnen;Wohnbauflächen;Hamburg;;
+;;BHN;Bahn;Flächen für Bahnanlagen*;Hamburg;;
+BAU;Bau;MSH;Misch;Gemischte Bauflächen deren Charakter als Dienstleistungszentren für die Wohnbevölkerung und für die Wirtschaft durch besondere Festsetzungen gesichert werden soll;Hamburg;;
+BAU;Bau;MSH;Misch;Gemischte Bauflächen;Hamburg;;
+;;GMB;Gemeinbedarf;Flächen für Gemeinbedarf geringfügig bebaut;Hamburg;;
+;;FDH;Friedhof;Grünflächen (Friedhof);Hamburg;;
+STR;Strassen;VRK;Verkehr;Sonstige Hauptverkehrstraßen*;Hamburg;;
+;;SND;Sonder;Sonderbauflächen;Hamburg;;
+BRH;Brache;FRF;Freifläche;Fläche für Aufschüttungen;Hamburg;;
+STR;Strassen;VRK;Verkehr;Verkehrfläche/Autobahnen oder autobahnähnliche Straßen*;Hamburg;;
+;;WHN;Wohnen;Wohnbauflächen deren parkartiger Charakter durch besondere Festsetzungen gesichert werden soll;Hamburg;;
+;;LVK;Luftverkehr;In Aussicht genommene Umgrenzung der Flächen für den Luftverkehr;Hamburg;;
+DRF;Dorf;WHN;Wohnen;Dorfgebiete;Hamburg;;
+;;GRF;Grünfläche;Grünflächen ;Hamburg;;
+;;LVK;Luftverkehr;Flächen für den Luftverkehr;Hamburg;;
+;;BAU;Bau;Baufla_chen;Munich;;
+;;WHN;Wohnen;Wohnbaufla_chen;Munich;;
+;;WHN;Wohnen;Kleinsiedlungsgebiete;Munich;;
+;;WHN;Wohnen;Reine Wohngebiete;Munich;;
+;;WHN;Wohnen;Allgemeine Wohngebiete;Munich;;
+;;WHN;Wohnen;Besondere Wohngebiete;Munich;;
+;;MSH;Misch;Gemischte Baufla_chen;Munich;;
+DRF;Dorf;WHN;Wohnen;Dorfgebiete;Munich;;
+;;MSH;Misch;Mischgebiete;Munich;;
+;;KRN;Kern;Kerngebiete;Munich;;
+;;GWB;Gewerbe;Gewerbliche Baufla_chen;Munich;;
+;;GWB;Gewerbe;Gewerbegebiete;Munich;;
+;;IND;Industrie;Industriegebiete;Munich;;
+;;GMB;Gemeinbedarf;Gemeinbedarfsfla_chen;Munich;;
+BLD;Bildung;GMB;Gemeinbedarf;Gemeinbedarfsfla_chen Erziehung;Munich;;
+;;GMB;Gemeinbedarf;Gemeinbedarfsflachen Fursorge;Munich;;
+GSD;Gesundheit;GMB;Gemeinbedarf;Gemeinbedarfsfla_chen Gesundheit;Munich;;
+KLT;Kultur;FRZ;Freizeit;Gemeinbedarfsfla_chen Kultur;Munich;;
+;Religion;GMB;Gemeinbedarf;Gemeinbedarfsfla_chen Religion;Munich;;
+SPT;Sport;FRZ;Freizeit;Gemeinbedarfsfla_chen Sport;Munich;;
+;;GMB;Gemeinbedarf;Gemeinbedarfsfla_chen Sicherheit;Munich;;
+;;GMB;Gemeinbedarf;Gemeinbedarfsfla_chen Verwaltung;Munich;;
+;;GMB;Gemeinbedarf;Gemeinbedarfsfla_chen Wissenschaft;Munich;;
+;;VES;Versorgung;Ver- und Entsorgungsfla_chen;Munich;;
+;;SND;Sonder;Sondergebiete;Munich;;
+;;IND;Industrie;Sondergebiete Brauereiverlagerung;Munich;;
+SHP;Shopping;GWB;Gewerbe;Sondergebiete Einzelhandel;Munich;;
+;;IND;Industrie;Sondergebiete Forschung;Munich;;
+SHP;Shopping;GWB;Gewerbe;Sondergebiete Fachmarkt;Munich;;
+;;GWB;Gewerbe;Sondergebiete Gewerblicher Gemeinbedarf;Munich;;
+;;GWB;Gewerbe;Sondergebiete Großhandel;Munich;;
+;;IND;Industrie;Sondergebiete Industrieller Gemeinbedarf;Munich;;
+BLD;Bildung;GMB;Gemeinbedarf;Sondergebiete Hochschule;Munich;;
+;Militär;MLT;Militär;Sondergebiete Landesverteidigung;Munich;;
+MSS;Messe;GWB;Gewerbe;Sondergebiete Messe;Munich;;
+;;VRK;Verkehr;Verkehrsfla_chen;Munich;;
+;;VRK;Verkehr;Uberortliche Hauptverkehrsstraﬂen;Munich;;
+;;VRK;Verkehr;O_rtliche Hauptverkehrsstraßen, die auch dem Durchgangsverkehr dienen;Munich;;
+;;VRK;Verkehr;Offentliche Parkplatze;Munich;;
+FSG;Fußgänger;GMB;Gemeinbedarf;Fuﬂgangerbereiche;Munich;;
+FSG;Fußgänger;GMB;Gemeinbedarf;Fuﬂgangerbereiche begrunt;Munich;;
+;;BHN;Bahn;Bahnanlagen;Munich;;
+;;GRF;Grünfläche;Grunflachen;Munich;;
+;;GRF;Grünfläche;Allgemeine Grunflachen;Munich;;
+;;GRF;Grünfläche;Grunflachen mit besonderer Zweckbestimmung;Munich;;
+ODR;Outdoor;FRZ;Freizeit;Campingpla_tze;Munich;;
+;;FDH;Friedhof;Friedho_fe;Munich;;
+;;FRZ;Freizeit;Intensiv nutzbarer Bereich fu_r Jugendliche;Munich;;
+;;FRZ;Freizeit;Kleinga_rten;Munich;;
+;;GRF;Grünfläche;Sondergrunflachen (z.B. Olympiapark);Munich;;
+SPT;Sport;FRZ;Freizeit;Sportanlagen;Munich;;
+;;LWT;Landwirtschaft;Okologische Vorrangflachen;Munich;;
+;;FRF;Freifläche;Sonstige Freifla_chen;Munich;;
+WLD;Wald;GRF;Grünfläche;Waldfla_chen;Munich;;
+;;LWT;Landwirtschaft;Flachen fur die Landwirtschaft;Munich;;
+;;FRZ;Freizeit;Flachen fur den Gartenbau;Munich;;
+;;IND;Industrie;Vorrangflache fur Kiesabbau;Munich;;
+;;WSR;Wasser;Wasserfla_chen;Munich;;
+;;FRF;Freifläche;U_berschwemmungsgebiete;Munich;;
+;;GRF;Grünfläche;Sonstige Grunflachen (z.B. Abstandsgrun, Verkehrsbegleitgrun);Munich;;
+;;LWT;Landwirtschaft;Grünfläche mit tw. landwirtschftl. Nutzung;Cologne;;
+;;GMB;Gemeinbedarf;Gemeinbedarfsfläche;Cologne;;
+;;WHN;Wohnen;Wohnbaufläche;Cologne;;
+;;GWB;Gewerbe;Gewerbefläche;Cologne;;
+;;WSR;Wasser;Wasserfläche;Cologne;;
+;;MSH;Misch;Mischfläche;Cologne;;
+;;SND;Sonder;Sonderbaufläche mit Zweckbestimmung;Cologne;;
+;;VES;Versorgung;Fläche für Ver- und Entsorgung;Cologne;;
+;;IND;Industrie;Industriefläche;Cologne;;
+;;MSH;Misch;Mischgebiet ohne Wohngebietscharakter dichte Bebauung;Cologne;;
+;;LWT;Landwirtschaft;Fläche für die Landwirtschaft;Cologne;;
+;;WHN;Wohnen;Besonderes Wohngebiet;Cologne;;
+;;BHN;Bahn;Fläche für Bahnanlagen;Cologne;;
+;;GRF;Grünfläche;Fläche für die Forstwirtschaft;Cologne;;
+;;KRN;Kern;Kerngebiet;Cologne;;
+;;SND;Sonder;Sonderbaufläche mit Zweckbestimmung;Cologne;;
+;;SND;Sonder;Sonderbaufläche allgemein;Cologne;;
+;;BHN;Bahn;Fläche für Hauptverkehrszüge;Cologne;;
+SPT;Sport;FRZ;Freizeit;Grünfläche mit besonderer Nutzung;Cologne;Golf;
+;;WHN;Wohnen;Wohnbaufläche;Cologne;;
+;;BHN;Bahn;Fläche für Bahnanlagen;Cologne;;
+;;MLT;Militär;Waldfläche mit besonderer Nutzung;Cologne;Militärischer Bereich;
+;;GWB;Gewerbe;Gewerbefläche;Cologne;;
+;;GWB;Gewerbe;Gewerbefläche;Cologne;Berichtigung erforderlich;
+;;WHN;Wohnen;Sanierungsgebiet;Cologne;;
+;;GMB;Gemeinbedarf;Sonderbaufläche allgemein;Cologne;Veranstaltungen;
+SPT;Sport;FRZ;Freizeit;Grünfläche mit tw. landwirtschftl. Nutzung;Cologne;Golf;
+;;SND;Sonder;Sonderbaufläche allgemein;Cologne;;
+WND;Windenergie;ENG;Energie;Fläche für Windenergieanlagen;Cologne;;WEA
+;;LVK;Luftverkehr;Fläche für den Luftverkehr;Cologne;;
+KLT;Kultur;GMB;Gemeinbedarf;Sonderbaufläche mit Zweckbestimmung;Cologne;Theater;
+;;WHN;Wohnen;Wohnbaufläche zurückgestellt;Cologne;;
+;;BHN;Bahn;Fläche für Hauptverkehrszüge;Cologne;;
+PRK;Parken;VRK;Verkehr;Grünfläche mit besonderer Nutzung;Cologne;Stellplätze;
+;;SND;Sonder;Sonderbaufläche mit Zweckbestimmung;Cologne;;
+SPT;Sport;FRZ;Freizeit;Sonderbaufläche allgemein;Cologne;;Sport/Gesundheit/Bildung
+BLD;Bildung;GMB;Gemeinbedarf;Sonderbaufläche mit Zweckbestimmung;Cologne;;F.H.
+;;BHN;Bahn;Sonderbaufläche mit Zweckbestimmung;Cologne;;KVB-Betriebshof
+SHP;Shopping;GWB;Gewerbe;Sonderbaufläche mit Zweckbestimmung;Cologne;;großfl. E.H.
+KLT;Kultur;GMB;Gemeinbedarf;Sonderbaufläche mit Zweckbestimmung;Cologne;;Kulturelle Einrichtungen
+;;SND;Sonder;Sonderbaufläche mit Zweckbestimmung;Cologne;;Heim d. Inn. Miss.
+;;SND;Sonder;Sonderbaufläche mit Zweckbestimmung;Cologne;;DFVLR
+;;SND;Sonder;Sonderbaufläche mit Zweckbestimmung;Cologne;;GVZ
+SHP;Shopping;GWB;Gewerbe;Sonderbaufläche mit Zweckbestimmung;Cologne;;Möbelmarkt
+;;SND;Sonder;Sonderbaufläche mit Zweckbestimmung;Cologne;;G.M.I.
+;;SND;Sonder;Sonderbaufläche mit Zweckbestimmung;Cologne;;Schlachthof
+;;GWB;Gewerbe;Sonderbaufläche mit Zweckbestimmung;Cologne;;Messe
+;;SND;Sonder;Sonderbaufläche mit Zweckbestimmung;Cologne;;Forensik
+;;SND;Sonder;Sonderbaufläche mit Zweckbestimmung;Cologne;;Reha-Zentr.
+SPT;Sport;FRZ;Freizeit;Sonderbaufläche allgemein;Cologne;;Sport/Kultur
+BGS;Biogas;ENG;Energie;Sonderbaufläche mit Zweckbestimmung;Cologne;;Biogasanlage
+SHP;Shopping;GWB;Gewerbe;Sonderbaufläche mit Zweckbestimmung;Cologne;;großfl. E.H.+z.S.
+;;SND;Sonder;Sonderbaufläche mit Zweckbestimmung;Cologne;;PH
+RLG;Religion;GMB;Gemeinbedarf;Sonderbaufläche mit Zweckbestimmung;Cologne;;Kloster
+;;MLT;Militär;Sonderbaufläche mit Zweckbestimmung;Cologne;;Miltärischer Bereich
+;;SND;Sonder;Sonderbaufläche allgemein;Cologne;;Nahversorgung
+;;SND;Sonder;Sonderbaufläche mit Zweckbestimmung;Cologne;;MPI
+;;MLT;Militär;Sonderbaufläche mit Zweckbestimmung;Cologne;;Militärischer Bereich
+SPT;Sport;GMB;Gemeinbedarf;Sonderbaufläche mit Zweckbestimmung;Cologne;;EIS u. SCHWIMMST.
+;;VRK;Verkehr;Sonderbaufläche mit Zweckbestimmung;Cologne;;P+R / Hotel
+;;SND;Sonder;Sonderbaufläche mit Zweckbestimmung;Cologne;;Messe/Verk.Üb.Pl.
+;;SND;Sonder;Sonderbaufläche mit Zweckbestimmung;Cologne;;Vollz.anstalt
+;;SND;Sonder;Sonderbaufläche mit Zweckbestimmung;Cologne;;F.M.A.
+BLD;Bildung;GMB;Gemeinbedarf;Sonderbaufläche mit Zweckbestimmung;Cologne;;Sporthochschule
+SHP;Shopping;GWB;Gewerbe;Sonderbaufläche mit Zweckbestimmung;Cologne;;Baumarkt
+;;SND;Sonder;Sonderbaufläche mit Zweckbestimmung;Cologne;;Lager/GVZ
+SPT;Sport;FRZ;Freizeit;Sonderbaufläche mit Zweckbestimmung;Cologne;;Golf
+;;SND;Sonder;Sonderbaufläche mit Zweckbestimmung;Cologne;;Fermeldeturm
+;;SND;Sonder;Sonderbaufläche mit Zweckbestimmung;Cologne;;Rundfunk
+KLT;Kultur;GMB;Gemeinbedarf;Sonderbaufläche mit Zweckbestimmung;Cologne;;kultur. Einricht./Theater
+;;HFN;Hafen;Sonderbaufläche mit Zweckbestimmung;Cologne;;Hafen
+;;GMB;Gemeinbedarf;Sonderbaufläche mit Zweckbestimmung;Cologne;;Clubhaus
+BLD;Bildung;GMB;Gemeinbedarf;Sonderbaufläche mit Zweckbestimmung;Cologne;;UNI
+;;SND;Sonder;Sonderbaufläche mit Zweckbestimmung;Cologne;;Soz. Einricht.
+BLD;Bildung;GMB;Gemeinbedarf;Sonderbaufläche mit Zweckbestimmung;Cologne;;FH
+SHP;Shopping;GWB;Gewerbe;Sonderbaufläche mit Zweckbestimmung;Cologne;;Großmarkt
+ODR;Outdoor;FRZ;Freizeit;Sonderbaufläche mit Zweckbestimmung;Cologne;;Camping
+SPT;Sport;FRZ;Freizeit;Sonderbaufläche mit Zweckbestimmung;Cologne;;Stadion
+;;GWB;Gewerbe;Sonderbaufläche mit Zweckbestimmung;Cologne;;Post
+;;BHN;Bahn;Sonderbaufläche mit Zweckbestimmung;Cologne;;KVB
+SHP;Shopping;GWB;Gewerbe;Sonderbaufläche mit Zweckbestimmung;Cologne;;Blumenmarkt
+;;SND;Sonder;Sonderbaufläche mit Zweckbestimmung;Cologne;;Festplatz
+;;MSH;Misch;Mischgebiet;Cologne;;
+;;GWB;Gewerbe;Gewerbefläche;Cologne;Berechtigung erforderlich;
+KLT;Kultur;GMB;Gemeinbedarf;Sonderbaufläche mit Zweckbestimmung;Cologne;Theater;kultur. Einricht./Theater
+SPT;Sport;FRZ;Freizeit;Sonderbaufläche allgemein;Cologne;Veranstaltungen;Sport/Kultur

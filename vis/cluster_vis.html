@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+        <title>Walks</title>
+        <meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width">
+		<script src="libs/d3.v3.min.js" charset="utf-8" type="text/javascript" ></script>
+		<style type="text/css">
+			body,html{
+				padding:50px;
+			}
+
+			circle.descriptor{
+				stroke:transparent;
+				fill:rgba(100,100,100,1);
+			}
+
+			circle.radius{
+				stroke:rgba(150,150,150,0.1);
+				fill:rgba(200,200,200,0.01);
+			}
+
+			circle.result{
+				stroke:transparent;
+				fill:rgba(0,0,0,1);
+			}
+
+			path.result{
+				fill:transparent;
+				stroke:black;
+			}
+
+			path.descriptor{
+				fill:transparent;
+				stroke:black;
+			}
+		</style>
+	</head>
+	<body>
+        <script type="text/javascript">
+
+            var width = 700,
+                height = 700,
+				id = 52,
+                svg = d3.select('body').append("svg").attr("height",height).attr("width",width);
+
+			d3.json('../clusterPerformance.json', function(data){
+				var center = [
+					d3.mean([d3.mean(data.individual[id].descriptors, function(d){return d.longitude;}),d3.mean(data.individual[id].result, function(d){return d.longitude;})]),
+					d3.mean([d3.mean(data.individual[id].descriptors, function(d){return d.latitude;}),d3.mean(data.individual[id].result, function(d){return d.latitude;})])
+				];
+
+				var projection = d3.geo.mercator()
+					.precision(0.1)
+					.translate([width / 2, height / 2])
+					.scale(1000000)
+					.center(center);
+
+				svg.selectAll("circle.radius").data(data.individual[id].descriptors).enter().append("circle")
+					.attr("r",155)
+					.attr("cx",function(d){
+						return (projection([d.longitude,d.latitude]))[0];
+					})
+					.attr("cy",function(d){
+						return (projection([d.longitude,d.latitude]))[1];
+					})
+					.attr("class", "radius");
+
+				svg.selectAll("circle.descriptor").data(data.individual[id].descriptors).enter().append("circle")
+					.attr("r",4)
+					.attr("cx",function(d){
+						return (projection([d.longitude,d.latitude]))[0];
+					})
+					.attr("cy",function(d){
+						return (projection([d.longitude,d.latitude]))[1];
+					})
+					.attr("class", "descriptor");
+
+				console.log(data);
+
+				svg.selectAll("circle.result").data(data.individual[id].result).enter().append("circle")
+					.attr("r",2)
+					.attr("cx",function(d){
+						return (projection([d.longitude,d.latitude]))[0];
+					})
+					.attr("cy",function(d){
+						return (projection([d.longitude,d.latitude]))[1];
+					})
+					.attr("class", "result");
+
+				var vertices = [];
+				data.individual[id].result.forEach(function(el, i, arr){
+					vertices.push(projection([el.longitude,el.latitude]));
+				});
+
+				svg.append("path").attr("class","result").datum(d3.geom.hull(vertices)).attr("d", function(d) { return "M" + d.join("L") + "Z"; });
+
+				vertices = [];
+				data.individual[id].descriptors.forEach(function(el, i, arr){
+					vertices.push(projection([el.longitude,el.latitude]));
+				});
+
+				svg.append("path").attr("class","descriptor").datum(d3.geom.hull(vertices)).attr("d", function(d) { return "M" + d.join("L") + "Z"; });
+
+			});
+	    </script>
+	</body>
+</html>
